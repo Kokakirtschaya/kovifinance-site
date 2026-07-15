@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <style>
+      /* Сюжет под текст карточки «Берёмся там, где банки отказывают напрямую»:
+         прямой путь к цели перечёркнут, обходной — находится и доходит.
+         Ни одной буквы: на карточке рисунок ~120px, текст там нечитаем в принципе. */
+
+      /* Обходной маршрут прорисовывается. pathLength=100 нормирует длину пути,
+         поэтому dasharray задаётся в «процентах», а не в пикселях. */
+      .route {
+        stroke-dasharray: 100;
+        animation: drawRoute 6s infinite ease-in-out;
+      }
+      @keyframes drawRoute {
+        0%, 28%  { stroke-dashoffset: 100; opacity: 1; }
+        65%, 88% { stroke-dashoffset: 0; opacity: 1; }
+        100%     { stroke-dashoffset: 0; opacity: 0; }
+      }
+
+      /* Крест «напрямую нельзя» появляется первым — он причина обхода.
+         fill-box обязателен: иначе точкой отсчёта станет центр холста,
+         и крест поедет в сторону вместо роста на месте. */
+      .block {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: blockPop 6s infinite ease-out;
+      }
+      @keyframes blockPop {
+        0%, 14%  { transform: scale(0.5); opacity: 0; }
+        22%      { transform: scale(1.2); opacity: 1; }
+        30%, 88% { transform: scale(1); opacity: 1; }
+        100%     { transform: scale(1); opacity: 0; }
+      }
+
+      /* Цель загорается ровно тогда, когда маршрут до неё дошёл */
+      .goal {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: goalPop 6s infinite ease-out;
+      }
+      @keyframes goalPop {
+        0%, 65%   { transform: scale(1); }
+        73%       { transform: scale(1.4); }
+        82%, 100% { transform: scale(1); }
+      }
+    </style>
+  </defs>
+
+  <!-- Стойка и лоток: светлые, иначе на тёмно-зелёной карточке не читаются -->
+  <g stroke="#d7ded9" stroke-linecap="round" fill="none">
+    <line x1="140" y1="372" x2="105" y2="462" stroke-width="9" />
+    <line x1="360" y1="372" x2="395" y2="462" stroke-width="9" />
+    <line x1="88" y1="462" x2="122" y2="462" stroke-width="9" />
+    <line x1="378" y1="462" x2="412" y2="462" stroke-width="9" />
+    <line x1="120" y1="432" x2="380" y2="432" stroke-width="6" />
+  </g>
+
+  <!-- Доска -->
+  <rect x="70" y="60" width="360" height="300" rx="14" fill="#f2efe8" stroke="#0e4634" stroke-width="10" />
+  <rect x="60" y="360" width="380" height="12" rx="4" fill="#d7ded9" />
+
+  <!-- Заметки на доске: просто цветные листки, без текста -->
+  <rect x="100" y="90" width="46" height="34" rx="3" fill="#d4a017" transform="rotate(-6 123 107)" opacity="0.9" />
+  <rect x="352" y="286" width="44" height="32" rx="3" fill="#1e7a57" transform="rotate(5 374 302)" opacity="0.9" />
+
+  <!-- Прямой путь: перечёркнут -->
+  <line x1="135" y1="215" x2="365" y2="215" stroke="#0e4634" stroke-width="4" stroke-dasharray="10,9" opacity="0.35" />
+
+  <!-- Обходной маршрут: дуга поверх преграды -->
+  <path class="route" d="M 135 215 Q 250 95 365 215" pathLength="100" fill="none"
+        stroke="#1e7a57" stroke-width="8" stroke-linecap="round" />
+
+  <!-- Старт -->
+  <circle cx="135" cy="215" r="11" fill="#0e4634" />
+
+  <!-- Преграда -->
+  <g class="block" stroke="#cc4b37" stroke-width="7" stroke-linecap="round">
+    <line x1="236" y1="201" x2="264" y2="229" />
+    <line x1="264" y1="201" x2="236" y2="229" />
+  </g>
+
+  <!-- Цель -->
+  <circle class="goal" cx="365" cy="215" r="15" fill="#d4a017" />
+</svg>

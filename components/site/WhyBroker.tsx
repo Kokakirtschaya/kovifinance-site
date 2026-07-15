@@ -1,5 +1,6 @@
 import Reveal from "@/components/site/Reveal";
 import AdvantageIcon, { type AdvantageIconName } from "@/components/site/AdvantageIcon";
+import CardChevrons from "@/components/site/CardChevrons";
 
 const POINTS: { title: string; bank: string; us: string; icon: AdvantageIconName }[] = [
   {
@@ -39,23 +40,26 @@ export default function WhyBroker() {
       <div className="mt-12 grid gap-5 md:grid-cols-3">
         {POINTS.map((p, i) => (
           <Reveal key={i} delay={i * 0.06} className="h-full">
-            <div className="group flex h-full flex-col rounded-2xl border border-black/[0.07] bg-white p-6 shadow-[var(--shadow-soft)] transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]">
-              <div className="mb-4 grid h-10 w-10 place-items-center rounded-lg bg-ink">
-                <AdvantageIcon name={p.icon} />
-              </div>
-              <h3 className="text-lg font-semibold tracking-tight">{p.title}</h3>
-              <div className="mt-5 space-y-3 text-sm">
-                <div className="flex gap-3 rounded-xl bg-paper-2/70 p-3 text-muted">
-                  <span className="text-red-400">✕</span>
-                  <span>
-                    <b className="text-ink/70">Банк напрямую:</b> {p.bank}
-                  </span>
+            <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-brand-dark p-6 shadow-[var(--shadow-soft)] transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]">
+              <CardChevrons />
+              <div className="relative flex h-full flex-col">
+                <div className="mb-4 grid h-10 w-10 place-items-center rounded-lg bg-white/10">
+                  <AdvantageIcon name={p.icon} />
                 </div>
-                <div className="flex gap-3 rounded-xl bg-brand-soft p-3 text-brand-dark">
-                  <span className="text-brand">✓</span>
-                  <span>
-                    <b>Через нас:</b> {p.us}
-                  </span>
+                <h3 className="text-lg font-semibold tracking-tight text-white">{p.title}</h3>
+                <div className="mt-5 space-y-3 text-sm">
+                  <div className="flex gap-3 rounded-xl bg-white/[0.06] p-3 text-white/70">
+                    <span className="text-red-300">✕</span>
+                    <span>
+                      <b className="text-white/75">Банк напрямую:</b> {p.bank}
+                    </span>
+                  </div>
+                  <div className="flex gap-3 rounded-xl bg-brand/35 p-3 text-white/85">
+                    <span className="text-gold-bright">✓</span>
+                    <span>
+                      <b className="text-white">Через нас:</b> {p.us}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

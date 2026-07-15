@@ -1,23 +1,40 @@
 import { PROCESS } from "@/lib/site";
 import Reveal from "@/components/site/Reveal";
 import AdvantageIcon, { type AdvantageIconName } from "@/components/site/AdvantageIcon";
+import CardChevrons from "@/components/site/CardChevrons";
 
-const ADVANTAGES: { title: string; desc: string; icon: AdvantageIconName }[] = [
+/** decor.box — доля от карточки, а не пиксели: карточка резиновая, и жёсткий размер
+    на узком экране заполнял её целиком и наезжал на текст. Потолок по высоте не даёт
+    картинке вылезти за карточку, object-contain держит пропорции файла. */
+const ADVANTAGES: {
+  title: string;
+  desc: string;
+  icon: AdvantageIconName;
+  decor?: { src: string; box: string };
+}[] = [
   {
     title: "Оплата за результат",
     desc: "Комиссия — только после того, как вы получили деньги.",
     icon: "result",
+    decor: { src: "/decor/cash-register.svg", box: "w-[60%] max-h-[78%]" },
   },
   {
     title: "40+ банков",
     desc: "Подаём в несколько банков сразу и выбираем лучшие условия.",
     icon: "banks",
+    decor: { src: "/decor/banks.svg", box: "w-[88%] max-h-[78%]" },
   },
-  { title: "Сложные кейсы", desc: "Берёмся там, где банки отказывают напрямую.", icon: "cases" },
+  {
+    title: "Сложные кейсы",
+    desc: "Берёмся там, где банки отказывают напрямую.",
+    icon: "cases",
+    decor: { src: "/decor/cases.svg", box: "w-[60%] max-h-[78%]" },
+  },
   {
     title: "Личный менеджер",
     desc: "Один человек ведёт вашу сделку от заявки до денег.",
     icon: "manager",
+    decor: { src: "/decor/manager.svg", box: "w-[60%] max-h-[78%]" },
   },
 ];
 
@@ -55,13 +72,28 @@ export default function Process() {
           {ADVANTAGES.map((a, i) => (
             <Reveal key={a.title} delay={i * 0.06} className="h-full">
             <div
-              className="group h-full rounded-2xl border border-black/[0.07] bg-white p-6 shadow-[var(--shadow-soft)] transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]"
+              className="group relative h-full overflow-hidden rounded-2xl bg-brand-dark p-6 shadow-[var(--shadow-soft)] transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]"
             >
-              <div className="mb-4 grid h-10 w-10 place-items-center rounded-lg bg-ink">
-                <AdvantageIcon name={a.icon} />
+              {a.decor ? (
+                /* Анимация живёт внутри SVG, поэтому грузим картинкой — так её CSS не утечёт на страницу.
+                   next/image здесь не подходит: SVG он не оптимизирует без dangerouslyAllowSVG. */
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={a.decor.src}
+                  alt=""
+                  aria-hidden
+                  className={`pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 object-contain opacity-70 ${a.decor.box}`}
+                />
+              ) : (
+                <CardChevrons />
+              )}
+              <div className="relative">
+                <div className="mb-4 grid h-10 w-10 place-items-center rounded-lg bg-white/10">
+                  <AdvantageIcon name={a.icon} />
+                </div>
+                <h3 className="font-semibold tracking-tight text-white">{a.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-white/70">{a.desc}</p>
               </div>
-              <h3 className="font-semibold tracking-tight">{a.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">{a.desc}</p>
             </div>
             </Reveal>
           ))}

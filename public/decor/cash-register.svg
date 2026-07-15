@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
+  <defs>
+    <style>
+      /* Купюры идут первыми в разметке — в SVG порядок элементов задаёт слои,
+         поэтому касса закрывает их собой и купюра «пропадает внутри».
+         Раньше они стояли последними и проезжали поверх машины. */
+      .bill {
+        /* Без fill-box точкой отсчёта стал бы центр холста, а не самой купюры,
+           и её уводило бы по дуге. */
+        transform-box: fill-box;
+        transform-origin: center;
+        opacity: 0;
+      }
+
+      /* Падение: сверху, с покачиванием, до верхнего края кассы.
+         Дальше купюру перекрывает корпус — прозрачность лишь подчищает хвост. */
+      @keyframes billFallIn {
+        0%   { transform: translate(0, -230px) rotate(-14deg) scale(0.62); opacity: 0; }
+        12%  { opacity: 1; }
+        50%  { transform: translate(-26px, -150px) rotate(9deg) scale(0.82); opacity: 1; }
+        80%  { transform: translate(6px, -95px) rotate(-4deg) scale(0.92); opacity: 1; }
+        100% { transform: translate(0, -55px) rotate(0deg) scale(0.96); opacity: 0; }
+      }
+
+      #bill1 { animation: billFallIn 6s infinite ease-in; }
+      #bill2 { animation: billFallIn 6s infinite ease-in; animation-delay: 1.5s; }
+      #bill3 { animation: billFallIn 6s infinite ease-in; animation-delay: 3s; }
+      #bill4 { animation: billFallIn 6s infinite ease-in; animation-delay: 4.5s; }
+
+      /* Табло. Счётчик на псевдоэлементе after не работал: в SVG псевдоэлементы
+         не отрисовываются, а content не анимируется. Поэтому суммы — обычные
+         текстовые элементы, сменяющие друг друга прозрачностью. Каждая сумма
+         зажигается ровно тогда, когда очередная купюра скрывается в кассе. */
+      .score { opacity: 0; }
+      #score1 { animation: score1 6s infinite steps(1); }
+      #score2 { animation: score2 6s infinite steps(1); }
+      #score3 { animation: score3 6s infinite steps(1); }
+      #score4 { animation: score4 6s infinite steps(1); }
+      @keyframes score1 { 0% { opacity: 1 } 25%, 100% { opacity: 0 } }
+      @keyframes score2 { 0% { opacity: 0 } 25% { opacity: 1 } 50%, 100% { opacity: 0 } }
+      @keyframes score3 { 0% { opacity: 0 } 50% { opacity: 1 } 75%, 100% { opacity: 0 } }
+      @keyframes score4 { 0% { opacity: 0 } 75% { opacity: 1 } 100% { opacity: 0 } }
+    </style>
+  </defs>
+
+  <g id="scene">
+
+    <!-- ===== Купюры: нижний слой, их перекрывает касса ===== -->
+    <g id="bill1" class="bill">
+      <rect x="210" y="240" width="80" height="42" rx="4" fill="#a1dbb2" stroke="#2f3640" stroke-width="3" />
+      <circle cx="250" cy="261" r="11" fill="none" stroke="#2f3640" stroke-width="2" />
+      <text x="250" y="267" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="#2f3640">₽</text>
+    </g>
+
+    <g id="bill2" class="bill">
+      <rect x="210" y="240" width="80" height="42" rx="4" fill="#ffb0b0" stroke="#2f3640" stroke-width="3" />
+      <circle cx="250" cy="261" r="11" fill="none" stroke="#2f3640" stroke-width="2" />
+      <text x="250" y="267" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="#2f3640">₽</text>
+    </g>
+
+    <g id="bill3" class="bill">
+      <rect x="210" y="240" width="80" height="42" rx="4" fill="#a1dbb2" stroke="#2f3640" stroke-width="3" />
+      <circle cx="250" cy="261" r="11" fill="none" stroke="#2f3640" stroke-width="2" />
+      <text x="250" y="267" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="#2f3640">₽</text>
+    </g>
+
+    <g id="bill4" class="bill">
+      <rect x="210" y="240" width="80" height="42" rx="4" fill="#ffb0b0" stroke="#2f3640" stroke-width="3" />
+      <circle cx="250" cy="261" r="11" fill="none" stroke="#2f3640" stroke-width="2" />
+      <text x="250" y="267" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="#2f3640">₽</text>
+    </g>
+
+    <!-- ===== Касса: верхний слой ===== -->
+    <rect x="150" y="240" width="200" height="130" rx="8" fill="#ffffff" stroke="#2f3640" stroke-width="6" />
+
+    <rect x="190" y="170" width="120" height="60" rx="6" fill="#2f3640" stroke="#2f3640" stroke-width="2" />
+    <text id="score1" class="score" x="250" y="209" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="26" fill="#2ecc71">5 000</text>
+    <text id="score2" class="score" x="250" y="209" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="26" fill="#2ecc71">10 000</text>
+    <text id="score3" class="score" x="250" y="209" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="26" fill="#2ecc71">15 000</text>
+    <text id="score4" class="score" x="250" y="209" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="26" fill="#2ecc71">20 000</text>
+    <rect x="235" y="230" width="30" height="10" fill="#2f3640" />
+
+    <path d="M 150,320 L 120,380 L 380,380 L 350,320 Z" fill="#f1f2f6" stroke="#2f3640" stroke-width="6" stroke-linejoin="round" />
+    <rect x="155" y="335" width="20" height="12" rx="2" fill="#7f8c8d" />
+    <rect x="185" y="335" width="20" height="12" rx="2" fill="#2f3640" />
+    <rect x="215" y="335" width="20" height="12" rx="2" fill="#7f8c8d" />
+    <rect x="245" y="335" width="40" height="12" rx="2" fill="#e74c3c" />
+    <rect x="295" y="335" width="20" height="12" rx="2" fill="#2f3640" />
+
+    <rect x="145" y="355" width="20" height="12" rx="2" fill="#2f3640" />
+    <rect x="175" y="355" width="20" height="12" rx="2" fill="#7f8c8d" />
+    <rect x="205" y="355" width="20" height="12" rx="2" fill="#2f3640" />
+    <rect x="235" y="355" width="20" height="12" rx="2" fill="#2f3640" />
+    <rect x="265" y="355" width="20" height="12" rx="2" fill="#7f8c8d" />
+
+    <path d="M 140,380 L 100,450 L 400,450 L 360,380 Z" fill="#ced6e0" stroke="#2f3640" stroke-width="6" stroke-linejoin="round" />
+    <line x1="210" y1="380" x2="190" y2="450" stroke="#2f3640" stroke-width="4" />
+    <line x1="290" y1="380" x2="310" y2="450" stroke="#2f3640" stroke-width="4" />
+
+    <path d="M 100,440 L 90,470 L 410,470 L 400,440 Z" fill="#ffffff" stroke="#2f3640" stroke-width="6" stroke-linejoin="round" />
+    <circle cx="250" cy="455" r="4" fill="#2f3640" />
+    <rect x="248" y="455" width="4" height="8" fill="#2f3640" />
+
+  </g>
+</svg>
