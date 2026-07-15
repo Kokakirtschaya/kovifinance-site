@@ -10,22 +10,10 @@ const ADVANTAGES: Advantage[] = [
     decor: { src: "/decor/commission.svg", box: "w-[72%] max-h-[78%]" },
   },
   {
-    title: "Выше шанс закрыть",
-    desc: "Подаём в несколько банков сразу по необходимости, увеличивая вероятность выдачи, где это требуется.",
-    icon: "banks",
-    decor: { src: "/decor/banks.svg", box: "w-[88%] max-h-[78%]" },
-  },
-  {
-    title: "Берём отказников",
-    desc: "Клиенту отказали напрямую — это не конец. Доводим до сделки, вы получаете вознаграждение.",
-    icon: "cases",
-    decor: { src: "/decor/cases.svg", box: "w-[60%] max-h-[78%]" },
-  },
-  {
     title: "Вся работа на нас",
     desc: "Переговоры, документы, банки. Ваше дело — передать контакт.",
     icon: "manager",
-    decor: { src: "/decor/manager.svg", box: "w-[60%] max-h-[78%]" },
+    decor: { src: "/decor/work.svg", box: "w-[72%] max-h-[78%]" },
   },
 ];
 
@@ -37,7 +25,7 @@ export default function Agents() {
       className="bg-paper-2/60"
       title={
         <>
-          Три шага до <span className="text-brand">получения комиссии</span>
+          Два шага до <span className="text-brand">получения комиссии</span>
         </>
       }
       subtitle="Берём на себя переговоры с клиентом. Вы занимаетесь в это время своим бизнесом и поиском новых клиентов. После закрытия сделки получаете комиссию."

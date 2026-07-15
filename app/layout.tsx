@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Golos_Text, Inter } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/site/SmoothScroll";
+import ScrollProgress from "@/components/site/ScrollProgress";
 import CookieBanner from "@/components/site/CookieBanner";
 import YandexMetrica from "@/components/site/YandexMetrica";
 
@@ -56,6 +57,7 @@ export default function RootLayout({
     <html lang="ru" className={`${golos.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <SmoothScroll />
+        <ScrollProgress />
         {children}
         <CookieBanner />
         <YandexMetrica />

@@ -68,10 +68,12 @@ export default function Hero() {
           </div>
         </div>
 
-        <dl className="mt-14 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-white/10 pt-10 md:grid-cols-4">
+        {/* Первой колонке места больше: «более 20 млрд ₽» вдвое длиннее соседей и при
+            равных долях не влезал — ~270px текста в 260px колонки, ₽ отрывался на строку ниже. */}
+        <dl className="mt-14 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-white/10 pt-10 md:grid-cols-[1.35fr_1fr_1fr_1fr]">
           {STATS.map((s) => (
             <div key={s.label}>
-              <dt className="text-3xl font-semibold tracking-tight text-gold-bright md:text-4xl">
+              <dt className="text-3xl font-semibold tracking-tight text-gold-bright md:whitespace-nowrap md:text-4xl">
                 {s.num !== undefined ? (
                   <CountUp to={s.num} prefix={s.prefix ?? ""} suffix={s.suffix ?? ""} />
                 ) : (
