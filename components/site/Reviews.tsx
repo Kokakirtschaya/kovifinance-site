@@ -5,8 +5,7 @@ export default function Reviews() {
   return (
     <section className="mx-auto max-w-6xl px-5 py-20 md:py-28">
       <Reveal className="max-w-2xl">
-        <p className="text-sm font-semibold uppercase tracking-widest text-brand">Отзывы</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-[-0.02em] md:text-5xl">
+        <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">
           Что говорят <span className="text-brand">клиенты</span>
         </h2>
       </Reveal>

@@ -6,10 +6,10 @@ export default function TrustBar() {
   return (
     <section className="border-b border-black/5 bg-paper py-10">
       <div className="mx-auto max-w-3xl px-5 text-center">
-        <p className="text-lg font-semibold text-ink">Мы независимый брокер.</p>
+        <p className="text-lg font-semibold text-ink">Финансовые советники для бизнеса</p>
         <p className="mt-2 text-base leading-relaxed text-muted">
-          Представляем интересы заёмщика по доверенности и подаём заявку в банк — выбираем
-          лучшие условия <span className="text-brand">для вас, а не для банка</span>.
+          Разбираем задачу, подбираем инструмент и структурируем сделку — от заявки до денег.
+          Советуем <span className="text-brand">исходя из вашей выгоды, а не банковской</span>.
         </p>
       </div>
 

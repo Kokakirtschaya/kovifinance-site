@@ -10,49 +10,58 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 bg-paper/80 backdrop-blur-md">
       <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-4 px-5 py-2.5">
-        <a href="#top" className="flex items-center" aria-label="KOVI Finance — на главную">
+        <a href="#top" className="flex shrink-0 items-center" aria-label="KOVI Finance — на главную">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/logo-primary.svg" alt="KOVI Finance" className="h-8 w-auto" />
         </a>
 
-        <nav className="hidden items-center gap-7 md:flex">
+        {/* Полное меню только с lg. На 768–1024 логотип + 7 пунктов + телефон + кнопка
+            требуют ~1040px при доступных 984 — и всё это переносилось на вторую строку. */}
+        <nav className="hidden items-center gap-4 lg:flex xl:gap-7">
           {NAV.map((n) => (
             <a
               key={n.href}
               href={n.href}
-              className="text-sm text-muted transition-colors hover:text-ink"
+              className="whitespace-nowrap text-sm text-muted transition-colors hover:text-ink"
             >
               {n.label}
             </a>
           ))}
         </nav>
 
-        <div className="hidden flex-col items-end gap-2 md:flex">
+        <div className="hidden flex-col items-end gap-2 lg:flex">
           <div className="flex items-center gap-4">
-            <a href={CONTACTS.phoneHref} className="text-sm font-medium text-ink">
+            {/* Телефон и соцсети — с xl: на 1024–1280 они не помещаются рядом с меню.
+                Телефон при этом остаётся в герое, футере и липкой кнопке снизу. */}
+            <a
+              href={CONTACTS.phoneHref}
+              className="hidden whitespace-nowrap text-sm font-medium text-ink xl:block"
+            >
               {CONTACTS.phone}
             </a>
             <a
               href="#lead"
-              className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-dark"
+              className="whitespace-nowrap rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-dark"
             >
               Оставить заявку
             </a>
           </div>
-          <Socials />
+          <div className="hidden xl:block">
+            <Socials />
+          </div>
         </div>
 
         <button
           aria-label="Меню"
           onClick={() => setOpen((v) => !v)}
-          className="grid h-10 w-10 place-items-center rounded-lg border border-black/10 md:hidden"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-black/10 lg:hidden"
         >
           <span className="text-lg">{open ? "✕" : "☰"}</span>
         </button>
       </div>
 
       {open && (
-        <div className="border-t border-black/5 bg-paper px-5 py-4 md:hidden">
+        <div className="border-t border-black/5 bg-paper px-5 py-4 lg:hidden">
           <nav className="flex flex-col gap-3">
             {NAV.map((n) => (
               <a
@@ -64,6 +73,12 @@ export default function Header() {
                 {n.label}
               </a>
             ))}
+            <a
+              href={CONTACTS.phoneHref}
+              className="py-1 text-sm font-medium text-ink"
+            >
+              {CONTACTS.phone}
+            </a>
             <a
               href="#lead"
               onClick={() => setOpen(false)}

@@ -2,10 +2,10 @@ import Header from "@/components/site/Header";
 import Hero from "@/components/site/Hero";
 import TrustBar from "@/components/site/TrustBar";
 import Services from "@/components/site/Services";
-import WhyBroker from "@/components/site/WhyBroker";
 import Cases from "@/components/site/Cases";
 import Calculator from "@/components/site/Calculator";
 import Process from "@/components/site/Process";
+import Agents from "@/components/site/Agents";
 import Team from "@/components/site/Team";
 import FAQ from "@/components/site/FAQ";
 import LeadForm from "@/components/site/LeadForm";
@@ -40,10 +40,10 @@ export default function Home() {
         <Hero />
         <TrustBar />
         <Services />
-        <WhyBroker />
         <Cases />
         <Calculator />
         <Process />
+        <Agents />
         <Team />
         <FAQ />
         <LeadForm />

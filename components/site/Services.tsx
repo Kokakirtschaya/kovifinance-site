@@ -5,15 +5,12 @@ export default function Services() {
   return (
     <section id="services" className="mx-auto max-w-6xl px-5 py-20 md:py-28">
       <Reveal className="max-w-2xl">
-        <p className="text-sm font-semibold uppercase tracking-widest text-brand">
-          Услуги
-        </p>
-        <h2 className="mt-3 text-3xl font-bold tracking-[-0.02em] md:text-5xl">
-          Полный спектр финансовых <span className="text-brand">инструментов</span>
+        <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">
+          Подбираем инструмент <span className="text-brand">под вашу задачу</span>
         </h2>
         <p className="mt-4 text-lg text-muted">
-          Под задачу бизнеса любого масштаба — от пополнения оборотки до проектного
-          финансирования на миллиарды.
+          Кредит, гарантия, факторинг, лизинг или проектное финансирование — от пополнения
+          оборотки до сделок на миллиарды.
         </p>
       </Reveal>
 
@@ -21,6 +18,9 @@ export default function Services() {
         {SERVICES.map((s, i) => (
           <Reveal key={s.slug} delay={(i % 3) * 0.06} className="h-full">
             <div className="group flex h-full flex-col rounded-2xl border border-black/[0.07] bg-white p-6 shadow-[var(--shadow-soft)] transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
+                {s.segment}
+              </p>
               <h4 className="text-lg font-semibold tracking-tight">{s.title}</h4>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{s.desc}</p>
               <ul className="mt-5 flex flex-wrap gap-2">

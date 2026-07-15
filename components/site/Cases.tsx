@@ -7,10 +7,7 @@ export default function Cases() {
       <div className="grain pointer-events-none absolute inset-0 opacity-50" />
       <div className="relative mx-auto max-w-6xl px-5">
         <Reveal className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-widest text-gold-bright">
-            Результаты
-          </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-[-0.02em] md:text-5xl">
+          <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">
             Кейсы, где мы получили <span className="text-gold-bright">«да»</span>
           </h2>
           <p className="mt-4 text-lg text-white/60">

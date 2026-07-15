@@ -1,0 +1,193 @@
+<!-- viewBox расширен вправо до 560: купюры улетают на translate(290px), то есть до x≈534,
+     и при холсте 500 срезались по правому краю ровной вертикалью. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 500" width="560" height="500">
+  <defs>
+    <linearGradient id="rubleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#85C1E9" />
+      <stop offset="50%" stop-color="#73C6B6" />
+      <stop offset="100%" stop-color="#229954" />
+    </linearGradient>
+
+    <ellipse id="shadow" cx="180" cy="420" rx="110" ry="15" fill="rgba(0,0,0,0.15)" />
+
+    <style>
+      /* Анимация вибрации кассы при выдаче денег */
+      @keyframes registerShake {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        20% { transform: translate(-2px, 4px) scale(0.99, 1.01); }
+        40% { transform: translate(2px, -2px) scale(1.01, 0.99); }
+        60% { transform: translate(-1px, 2px); }
+        80% { transform: translate(1px, -1px); }
+      }
+      .cash-register {
+        transform-origin: 180px 350px;
+        animation: registerShake 2s infinite ease-in-out;
+      }
+
+      /* Базовый класс для вылетающих купюр */
+      .bill {
+        opacity: 0;
+        transform-origin: 220px 290px;
+      }
+
+      /* Индивидуальные анимации для создания хаотичного потока денег */
+      .bill-1 {
+        animation: flyOut1 2.5s infinite linear;
+      }
+      .bill-2 {
+        animation: flyOut2 2.5s infinite linear;
+        animation-delay: 0.6s;
+      }
+      .bill-3 {
+        animation: flyOut3 2.5s infinite linear;
+        animation-delay: 1.2s;
+      }
+      .bill-4 {
+        animation: flyOut4 2.5s infinite linear;
+        animation-delay: 1.8s;
+      }
+
+      /* Траектории полета с вращением и растворением */
+      @keyframes flyOut1 {
+        0% {
+          transform: translate(0, 0) rotate(0deg) scale(0.4);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(260px, -150px) rotate(380deg) scale(1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes flyOut2 {
+        0% {
+          transform: translate(0, 10px) rotate(0deg) scale(0.4);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(280px, -50px) rotate(-260deg) scale(0.9);
+          opacity: 0;
+        }
+      }
+
+      @keyframes flyOut3 {
+        0% {
+          transform: translate(0, -5px) rotate(0deg) scale(0.4);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(250px, -220px) rotate(440deg) scale(1.1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes flyOut4 {
+        0% {
+          transform: translate(0, 5px) rotate(0deg) scale(0.4);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(290px, -110px) rotate(-180deg) scale(0.85);
+          opacity: 0;
+        }
+      }
+    </style>
+  </defs>
+
+  <use href="#shadow" />
+
+  <g id="money-stream">
+    <g class="bill bill-1">
+      <rect x="210" y="280" width="70" height="38" rx="3" fill="url(#rubleGrad)" stroke="#196F3D" stroke-width="1.5" />
+      <rect x="215" y="284" width="60" height="30" rx="2" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-dasharray="4 2" />
+      <circle cx="245" cy="299" r="10" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" />
+      <path d="M242 294 h6 c3 0 5 1.5 5 3.5 s-2 3.5 -5 3.5 h-6 v3 h-3 v-3 h-2 v-2 h2 v-1.5 h-2 v-2 h2 v-3.5 z M242 299 h5 c1.5 0 2.5 -.5 2.5 -1.5 s-1 -1.5 -2.5 -1.5 h-5 z" fill="white" />
+    </g>
+
+    <g class="bill bill-2">
+      <rect x="210" y="280" width="70" height="38" rx="3" fill="url(#rubleGrad)" stroke="#196F3D" stroke-width="1.5" />
+      <rect x="215" y="284" width="60" height="30" rx="2" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-dasharray="4 2" />
+      <circle cx="245" cy="299" r="10" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" />
+      <path d="M242 294 h6 c3 0 5 1.5 5 3.5 s-2 3.5 -5 3.5 h-6 v3 h-3 v-3 h-2 v-2 h2 v-1.5 h-2 v-2 h2 v-3.5 z M242 299 h5 c1.5 0 2.5 -.5 2.5 -1.5 s-1 -1.5 -2.5 -1.5 h-5 z" fill="white" />
+    </g>
+
+    <g class="bill bill-3">
+      <rect x="210" y="280" width="70" height="38" rx="3" fill="url(#rubleGrad)" stroke="#196F3D" stroke-width="1.5" />
+      <rect x="215" y="284" width="60" height="30" rx="2" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-dasharray="4 2" />
+      <circle cx="245" cy="299" r="10" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" />
+      <path d="M242 294 h6 c3 0 5 1.5 5 3.5 s-2 3.5 -5 3.5 h-6 v3 h-3 v-3 h-2 v-2 h2 v-1.5 h-2 v-2 h2 v-3.5 z M242 299 h5 c1.5 0 2.5 -.5 2.5 -1.5 s-1 -1.5 -2.5 -1.5 h-5 z" fill="white" />
+    </g>
+
+    <g class="bill bill-4">
+      <rect x="210" y="280" width="70" height="38" rx="3" fill="url(#rubleGrad)" stroke="#196F3D" stroke-width="1.5" />
+      <rect x="215" y="284" width="60" height="30" rx="2" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-dasharray="4 2" />
+      <circle cx="245" cy="299" r="10" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" />
+      <path d="M242 294 h6 c3 0 5 1.5 5 3.5 s-2 3.5 -5 3.5 h-6 v3 h-3 v-3 h-2 v-2 h2 v-1.5 h-2 v-2 h2 v-3.5 z M242 299 h5 c1.5 0 2.5 -.5 2.5 -1.5 s-1 -1.5 -2.5 -1.5 h-5 z" fill="white" />
+    </g>
+  </g>
+
+  <g class="cash-register">
+    <path d="M100 400 L120 240 L240 240 L260 400 Z" fill="#F2F4F4" stroke="#BDC3C7" stroke-width="3" />
+    
+    <path d="M100 360 L260 360 L260 400 L100 400 Z" fill="#E5E8E8" stroke="#BDC3C7" stroke-width="2" />
+    <rect x="165" y="370" width="30" height="10" rx="2" fill="#BDC3C7" />
+    <circle cx="170" cy="375" r="2" fill="#7F8C8D" />
+
+    <path d="M120 240 L240 240 L225 340 L115 340 Z" fill="#FFFFFF" stroke="#BDC3C7" stroke-width="2" />
+
+    <rect x="135" y="160" width="90" height="50" rx="5" fill="#34495E" stroke="#BDC3C7" stroke-width="3" />
+    <rect x="172" y="210" width="16" height="30" fill="#BDC3C7" />
+    <rect x="142" y="167" width="76" height="36" rx="2" fill="#2ECC71" />
+    <rect x="150" y="177" width="40" height="16" rx="1" fill="#145A32" opacity="0.3" />
+    <circle cx="202" cy="185" r="4" fill="#145A32" />
+
+    <rect x="130" y="255" width="16" height="12" rx="1" fill="#E67E22" />
+    <rect x="152" y="255" width="16" height="12" rx="1" fill="#3498DB" />
+    <rect x="174" y="255" width="16" height="12" rx="1" fill="#BDC3C7" />
+    <rect x="196" y="255" width="16" height="12" rx="1" fill="#BDC3C7" />
+    <rect x="218" y="255" width="10" height="12" rx="1" fill="#95A5A6" />
+
+    <rect x="128" y="275" width="16" height="12" rx="1" fill="#BDC3C7" />
+    <rect x="150" y="275" width="16" height="12" rx="1" fill="#BDC3C7" />
+    <rect x="172" y="275" width="16" height="12" rx="1" fill="#BDC3C7" />
+    <rect x="194" y="275" width="16" height="12" rx="1" fill="#BDC3C7" />
+    <rect x="216" y="275" width="10" height="12" rx="1" fill="#95A5A6" />
+
+    <rect x="125" y="295" width="16" height="12" rx="1" fill="#BDC3C7" />
+    <rect x="147" y="295" width="16" height="12" rx="1" fill="#BDC3C7" />
+    <rect x="169" y="295" width="16" height="12" rx="1" fill="#BDC3C7" />
+    <rect x="191" y="295" width="16" height="12" rx="1" fill="#2ECC71" />
+    <rect x="213" y="295" width="10" height="12" rx="1" fill="#95A5A6" />
+
+    <rect x="122" y="315" width="38" height="14" rx="1" fill="#BDC3C7" />
+    <rect x="166" y="315" width="38" height="14" rx="1" fill="#27AE60" />
+    <rect x="210" y="315" width="12" height="14" rx="1" fill="#95A5A6" />
+
+    <path d="M225 240 L250 295 L235 340" fill="none" stroke="#BDC3C7" stroke-width="2" />
+    <path d="M234 275 L239 295" fill="none" stroke="#2C3E50" stroke-width="5" stroke-linecap="round" />
+  </g>
+</svg>

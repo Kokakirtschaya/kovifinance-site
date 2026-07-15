@@ -136,7 +136,7 @@ export default function CabinetDemo() {
         ) : (
           <div className="mx-auto max-w-5xl px-5 py-12">
             <h1 className="text-2xl font-bold tracking-[-0.02em] md:text-3xl">
-              Здравствуйте! Ваши заявки
+              Здравствуйте! Вот ваши заявки
             </h1>
             <p className="mt-2 text-muted">Статусы обновляются по мере работы с банками.</p>
 
