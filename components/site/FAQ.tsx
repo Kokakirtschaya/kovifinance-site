@@ -5,7 +5,8 @@ import { FAQ as ITEMS, CONTACTS } from "@/lib/site";
 import Reveal from "@/components/site/Reveal";
 
 export default function FAQ() {
-  const [open, setOpen] = useState<number | null>(0);
+  // null — свёрнуты все: список читается целиком, посетитель сам раскрывает нужное
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
     <section id="faq" className="mx-auto max-w-3xl px-5 py-20 md:py-28">
