@@ -7,6 +7,7 @@ import Calculator from "@/components/site/Calculator";
 import Process from "@/components/site/Process";
 import Agents from "@/components/site/Agents";
 import Team from "@/components/site/Team";
+import BrandLegend from "@/components/site/BrandLegend";
 import FAQ from "@/components/site/FAQ";
 import LeadForm from "@/components/site/LeadForm";
 import Footer from "@/components/site/Footer";
@@ -45,6 +46,7 @@ export default function Home() {
         <Process />
         <Agents />
         <Team />
+        <BrandLegend />
         <FAQ />
         <LeadForm />
       </main>

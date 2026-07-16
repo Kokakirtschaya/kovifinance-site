@@ -1,6 +1,8 @@
 export const CONTACTS = {
-  phone: "+7 (958) 111-64-67",
-  phoneHref: "tel:+79581116467",
+  // Показываем 8 800 (привычнее для России), звоним по +7 — работает и с мобильного,
+  // и из-за границы. Видимый текст и tel-ссылка независимы.
+  phone: "8 800 600 66 17",
+  phoneHref: "tel:+78006006617",
   email: "info@kovifinance.ru",
   emailHref: "mailto:info@kovifinance.ru",
   telegram: "https://t.me/kovifinance",
