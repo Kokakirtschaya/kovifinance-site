@@ -4,6 +4,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://kovifinance.ru";
   return [
     { url: base, changeFrequency: "weekly", priority: 1 },
+    // Посадочные под отдельные запросы — добавлять сюда каждую новую
+    { url: `${base}/zalogi_kred`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${base}/asv_kred`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/confidentiality`, changeFrequency: "yearly", priority: 0.3 },
   ];
 }
