@@ -111,6 +111,13 @@ export default function AsvForm() {
             </label>
 
             <Input name="city" label="Город" />
+            <Input
+              name="email"
+              label="E-mail"
+              type="email"
+              placeholder="you@company.ru"
+              hint="для отслеживания в личном кабинете"
+            />
           </div>
 
           <label className="mt-4 flex items-start gap-3 text-sm text-muted">
@@ -157,12 +164,14 @@ function Input({
   type = "text",
   required = false,
   placeholder,
+  hint,
 }: {
   name: string;
   label: string;
   type?: string;
   required?: boolean;
   placeholder?: string;
+  hint?: string;
 }) {
   return (
     <label className="block">
@@ -177,6 +186,7 @@ function Input({
         placeholder={placeholder}
         className="mt-1.5 w-full rounded-xl border border-black/10 bg-paper px-4 py-3 text-sm outline-none transition-colors focus:border-brand"
       />
+      {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
     </label>
   );
 }

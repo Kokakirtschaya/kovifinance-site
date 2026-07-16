@@ -17,6 +17,35 @@ export type CrmResult =
   | { ok: true; applications: Application[] }
   | { ok: false; reason: "unconfigured" | "unreachable" };
 
+export type LeadInput = {
+  name: string;
+  phone: string;
+  email?: string;
+  inn?: string;
+  title?: string; // продукт/услуга
+  amount?: string;
+  source?: string; // с какой страницы
+};
+
+// Отправка заявки в CRM (создаёт сделку). Не критично: если CRM недоступна,
+// заявка всё равно уходит в Telegram — вызывающий не должен падать.
+export async function createLead(lead: LeadInput): Promise<{ ok: boolean }> {
+  const base = process.env.CRM_API_URL;
+  const token = process.env.CRM_API_TOKEN;
+  if (!base || !token) return { ok: false };
+
+  try {
+    const res = await fetch(`${base}/api/public/leads`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(lead),
+    });
+    return { ok: res.ok };
+  } catch {
+    return { ok: false };
+  }
+}
+
 export async function getApplications(email: string): Promise<CrmResult> {
   const base = process.env.CRM_API_URL;
   const token = process.env.CRM_API_TOKEN;

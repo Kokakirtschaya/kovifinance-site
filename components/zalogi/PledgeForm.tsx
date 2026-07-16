@@ -89,6 +89,13 @@ export default function PledgeForm() {
             </label>
 
             <Input name="price" label="Примерная стоимость объекта, ₽" inputMode="numeric" />
+            <Input
+              name="email"
+              label="E-mail"
+              type="email"
+              placeholder="you@company.ru"
+              hint="для отслеживания в личном кабинете"
+            />
           </div>
 
           <label className="mt-4 flex items-start gap-3 text-sm text-muted">
@@ -136,6 +143,7 @@ function Input({
   required = false,
   placeholder,
   inputMode,
+  hint,
 }: {
   name: string;
   label: string;
@@ -143,6 +151,7 @@ function Input({
   required?: boolean;
   placeholder?: string;
   inputMode?: "numeric" | "tel" | "text";
+  hint?: string;
 }) {
   return (
     <label className="block">
@@ -158,6 +167,7 @@ function Input({
         inputMode={inputMode}
         className="mt-1.5 w-full rounded-xl border border-black/10 bg-paper px-4 py-3 text-sm outline-none transition-colors focus:border-brand"
       />
+      {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
     </label>
   );
 }

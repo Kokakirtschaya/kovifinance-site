@@ -86,6 +86,16 @@ export default function LeadForm() {
                 placeholder="+7 (___) ___-__-__"
                 required
               />
+              <div>
+                <Field name="email" label="E-mail" type="email" placeholder="you@company.ru" />
+                <p className="mt-1.5 text-xs text-muted">
+                  Оставьте, чтобы следить за заявкой в{" "}
+                  <a href="/lk" className="text-brand underline underline-offset-2">
+                    личном кабинете
+                  </a>
+                  .
+                </p>
+              </div>
               <Field name="inn" label="ИНН компании" placeholder="10 или 12 цифр" inputMode="numeric" />
               <div>
                 <label className="mb-1.5 block text-sm font-medium">Что интересует</label>
