@@ -20,6 +20,9 @@ export default function Hero() {
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
           {/* Текст */}
           <div>
+            <p className="rise mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-gold-bright">
+              Куём капитал
+            </p>
             <h1 className="rise text-4xl font-bold leading-[1.05] tracking-[-0.02em] sm:text-5xl md:text-6xl">
               Финансирование для бизнеса —{" "}
               <span className="text-gold-bright">быстро</span> и без лишней бюрократии
