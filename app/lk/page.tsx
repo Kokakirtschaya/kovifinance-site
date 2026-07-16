@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { auth, signIn, signOut } from "@/auth";
 import LoginForm from "@/app/lk/login-form";
+import { getApplications, type Application } from "@/lib/crm";
+
+const fmt = (n: string) => new Intl.NumberFormat("ru-RU").format(Number(n));
+const STEPS = ["Заявка принята", "В работе", "Подано в банк", "Решение банка"];
 
 export const metadata = { title: "Личный кабинет — KOVI Finance" };
 
@@ -90,33 +94,134 @@ export default async function CabinetPage({
   );
 }
 
-function Cabinet({ email }: { email: string }) {
+async function Cabinet({ email }: { email: string }) {
+  const result = await getApplications(email);
+
   return (
     <div className="mx-auto max-w-5xl px-5 py-12">
       <h1 className="text-2xl font-bold tracking-[-0.02em] md:text-3xl">Здравствуйте!</h1>
       <p className="mt-2 text-muted">
         Вы вошли как <span className="font-medium text-ink">{email}</span>.
+        {result.ok && result.applications.length > 0 && " Статусы обновляются по мере работы."}
       </p>
 
-      {/* TODO (этап 2): вместо заглушки — статусы заявок этого e-mail из CRM Kovi
-          по read-API. Сейчас база аккаунтов и вход работают, данные заявок ещё не
-          подключены. */}
-      <div className="mt-8 rounded-2xl border border-dashed border-black/15 bg-white/60 p-8 text-center">
-        <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-soft text-xl text-brand">
-          ⏳
+      {result.ok && result.applications.length > 0 ? (
+        <div className="mt-8 space-y-5">
+          {result.applications.map((a) => (
+            <ApplicationCard key={a.id} app={a} />
+          ))}
         </div>
-        <h2 className="mt-4 font-semibold tracking-tight">Заявки скоро появятся здесь</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-          Как только подключим статусы из нашей системы, вы будете видеть здесь ход по каждой
-          заявке — от приёма до решения банка.
-        </p>
-        <Link
-          href="/#lead"
-          className="mt-6 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
-        >
-          Оставить заявку
+      ) : (
+        <EmptyState result={result} />
+      )}
+
+      <div className="mt-8 rounded-2xl border border-dashed border-black/15 bg-white/60 p-5 text-sm text-muted">
+        Нужна ещё одна заявка?{" "}
+        <Link href="/#lead" className="font-semibold text-brand underline underline-offset-2">
+          Оформить новую
         </Link>
       </div>
+    </div>
+  );
+}
+
+// Пустой кабинет: разводим «заявок нет» и «CRM недоступна» — это разные ситуации
+function EmptyState({ result }: { result: Awaited<ReturnType<typeof getApplications>> }) {
+  const unreachable = !result.ok && result.reason === "unreachable";
+  return (
+    <div className="mt-8 rounded-2xl border border-dashed border-black/15 bg-white/60 p-8 text-center">
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-soft text-xl text-brand">
+        {unreachable ? "⚠" : "⏳"}
+      </div>
+      <h2 className="mt-4 font-semibold tracking-tight">
+        {unreachable ? "Не удалось загрузить заявки" : "Заявок пока нет"}
+      </h2>
+      <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+        {unreachable
+          ? "Попробуйте обновить страницу позже. Если не пройдёт — позвоните нам."
+          : "Как только вы оставите заявку и мы начнём по ней работать, здесь появится её статус — от приёма до решения банка."}
+      </p>
+      <Link
+        href="/#lead"
+        className="mt-6 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+      >
+        Оставить заявку
+      </Link>
+    </div>
+  );
+}
+
+function ApplicationCard({ app }: { app: Application }) {
+  const tone = app.rejected ? "rejected" : app.done ? "approved" : "progress";
+  return (
+    <div className="rounded-2xl border border-black/[0.07] bg-white p-6 shadow-[var(--shadow-soft)] md:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">{app.title}</h2>
+          <p className="mt-1 text-sm text-muted">
+            {app.amount ? `${fmt(app.amount)} ₽ · ` : ""}
+            {app.company}
+          </p>
+        </div>
+        <Badge label={app.status} tone={tone} />
+      </div>
+
+      <Tracker step={app.step} rejected={app.rejected} />
+
+      <p className="mt-5 border-t border-black/5 pt-4 text-sm text-muted">
+        Обновлено: {new Date(app.updatedAt).toLocaleDateString("ru-RU")}
+      </p>
+    </div>
+  );
+}
+
+function Badge({ label, tone }: { label: string; tone: "progress" | "approved" | "rejected" }) {
+  const styles = {
+    progress: "bg-brand-soft text-brand-dark",
+    approved: "bg-brand text-white",
+    rejected: "bg-red-50 text-red-600",
+  }[tone];
+  return <span className={`rounded-full px-3 py-1 text-xs font-semibold ${styles}`}>{label}</span>;
+}
+
+function Tracker({ step, rejected }: { step: number; rejected: boolean }) {
+  return (
+    <div className="mt-6 flex items-center">
+      {STEPS.map((label, i) => {
+        const n = i + 1;
+        const done = n < step;
+        const current = n === step;
+        // отказ красит текущий узел красным вместо зелёного
+        const color = rejected && current ? "border-2 border-red-400 bg-white text-red-500" : "";
+        return (
+          <div key={label} className="flex flex-1 items-center last:flex-none">
+            <div className="flex flex-col items-center">
+              <div
+                className={`grid h-8 w-8 place-items-center rounded-full text-xs font-bold ${
+                  color ||
+                  (done
+                    ? "bg-brand text-white"
+                    : current
+                    ? "border-2 border-brand bg-white text-brand"
+                    : "border border-black/15 bg-white text-muted")
+                }`}
+              >
+                {rejected && current ? "✕" : done ? "✓" : n}
+              </div>
+              <span
+                className={`mt-2 w-24 text-center text-[11px] leading-tight ${
+                  done || current ? "text-ink" : "text-muted"
+                }`}
+              >
+                {label}
+              </span>
+            </div>
+            {i < STEPS.length - 1 && (
+              <div className={`mx-1 h-0.5 flex-1 ${n < step ? "bg-brand" : "bg-black/10"}`} />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
