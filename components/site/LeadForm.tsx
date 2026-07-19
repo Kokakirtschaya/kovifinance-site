@@ -115,7 +115,7 @@ export default function LeadForm() {
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="w-full rounded-full bg-brand px-6 py-3.5 font-semibold text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+                className="press w-full rounded-full bg-brand px-6 py-3.5 font-semibold text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
               >
                 {status === "sending" ? "Отправляем…" : "Отправить заявку"}
               </button>

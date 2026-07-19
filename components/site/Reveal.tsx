@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 export default function Reveal({
   children,
@@ -13,8 +13,14 @@ export default function Reveal({
   y?: number;
   className?: string;
 }) {
+  const reduce = useReducedMotion();
+
+  // reduced-motion: контент виден сразу, без движения
+  if (reduce) return <div className={className}>{children}</div>;
+
   return (
     <motion.div
+      data-reveal
       className={className}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}

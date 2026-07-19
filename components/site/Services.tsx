@@ -15,13 +15,45 @@ export default function Services() {
       </Reveal>
 
       <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {SERVICES.map((s, i) => (
+        {SERVICES.map((s, i) => {
+          const badge =
+            s.slug === "credit"
+              ? {
+                  text: "Ключевой продукт",
+                  ring: "border-gold/40 ring-1 ring-gold/30",
+                  pill: "bg-gold/15 text-gold",
+                }
+              : s.slug === "mortgage"
+                ? {
+                    text: "Большой спрос",
+                    ring: "border-brand/40 ring-1 ring-brand/30",
+                    pill: "bg-brand-soft text-brand-dark",
+                  }
+                : s.slug === "project"
+                  ? {
+                      text: "Опережая рынок",
+                      ring: "border-ink/25 ring-1 ring-ink/15",
+                      pill: "bg-ink text-white",
+                    }
+                  : null;
+          return (
           <Reveal key={s.slug} delay={(i % 3) * 0.06} className="h-full">
-            <div className="group flex h-full flex-col rounded-2xl border border-black/[0.07] bg-white p-6 shadow-[var(--shadow-soft)] transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]">
+            <div
+              className={`group relative flex h-full flex-col rounded-2xl border bg-white p-6 shadow-[var(--shadow-soft)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] ${
+                badge ? badge.ring : "border-black/[0.07]"
+              }`}
+            >
+              {badge && (
+                <span
+                  className={`mb-3 self-start rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${badge.pill}`}
+                >
+                  {badge.text}
+                </span>
+              )}
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
                 {s.segment}
               </p>
-              <h4 className="text-lg font-semibold tracking-tight">{s.title}</h4>
+              <h3 className="text-lg font-semibold tracking-tight">{s.title}</h3>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{s.desc}</p>
               <ul className="mt-5 flex flex-wrap gap-2">
                 {s.points.map((p) => (
@@ -42,7 +74,8 @@ export default function Services() {
               </a>
             </div>
           </Reveal>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

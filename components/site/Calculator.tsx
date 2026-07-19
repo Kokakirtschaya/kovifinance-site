@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion } from "motion/react";
 import Reveal from "@/components/site/Reveal";
 
 const fmt = (n: number) =>
@@ -161,11 +162,18 @@ export default function Calculator() {
                 <button
                   key={m.key}
                   onClick={() => setMode(m.key)}
-                  className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
-                    mode === m.key ? "bg-ink text-white" : "text-ink/70 hover:text-ink"
+                  className={`relative rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                    mode === m.key ? "text-white" : "text-ink/70 hover:text-ink"
                   }`}
                 >
-                  {m.label}
+                  {mode === m.key && (
+                    <motion.span
+                      layoutId="calc-tab"
+                      className="absolute inset-0 rounded-full bg-ink"
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                    />
+                  )}
+                  <span className="relative z-10">{m.label}</span>
                 </button>
               ))}
             </div>
@@ -379,7 +387,7 @@ export default function Calculator() {
 
                 <a
                   href="#lead"
-                  className="mt-6 rounded-full bg-brand px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-brand-dark"
+                  className="press mt-6 rounded-full bg-brand px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-brand-dark"
                 >
                   Оставить заявку и получить точный расчёт
                 </a>

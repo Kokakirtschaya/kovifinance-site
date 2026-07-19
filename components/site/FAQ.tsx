@@ -36,7 +36,7 @@ export default function FAQ() {
                 </span>
               </button>
               <div
-                className={`grid transition-all duration-300 ease-out ${
+                className={`grid transition-[grid-template-rows] duration-300 ease-out ${
                   isOpen ? "grid-rows-[1fr] pb-5" : "grid-rows-[0fr]"
                 }`}
               >

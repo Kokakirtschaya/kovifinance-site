@@ -56,6 +56,10 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${golos.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        <noscript>
+          {/* Без JS whileInView не срабатывает — принудительно показываем reveal-контент */}
+          <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
+        </noscript>
         <SmoothScroll />
         <ScrollProgress />
         {children}

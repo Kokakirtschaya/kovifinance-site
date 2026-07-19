@@ -23,17 +23,20 @@ export default function Hero() {
             <p className="rise mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-gold-bright">
               Куём капитал
             </p>
-            <h1 className="rise text-4xl font-bold leading-[1.05] tracking-[-0.02em] sm:text-5xl md:text-6xl">
+            <h1
+              className="rise text-4xl font-bold leading-[1.05] tracking-[-0.02em] sm:text-5xl md:text-6xl"
+              style={{ animationDelay: "0.07s" }}
+            >
               Финансирование для бизнеса —{" "}
               <span className="text-gold-bright">быстро</span> и без лишней бюрократии
             </h1>
 
-            <p className="rise mt-6 max-w-xl text-lg text-white/70">
+            <p className="rise mt-6 max-w-xl text-lg text-white/70" style={{ animationDelay: "0.14s" }}>
               Подберём кредит, гарантию, факторинг или лизинг на выгодных условиях. Работаем
               с 40+ банками. Заявка — 5 минут, решение — от 3 дней. Оплата только за результат.
             </p>
 
-            <div className="rise mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="rise mt-8 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "0.21s" }}>
               <MagneticButton
                 href="#lead"
                 className="rounded-full bg-brand px-7 py-3.5 text-center font-semibold text-white shadow-lg hover:bg-brand-dark"
@@ -48,7 +51,7 @@ export default function Hero() {
               </MagneticButton>
             </div>
 
-            <p className="rise mt-4 text-sm text-white/50">
+            <p className="rise mt-4 text-sm text-white/70" style={{ animationDelay: "0.28s" }}>
               Или позвоните:{" "}
               <a href={CONTACTS.phoneHref} className="text-white/80 underline underline-offset-4">
                 {CONTACTS.phone}
@@ -58,7 +61,10 @@ export default function Hero() {
 
           {/* Изображение */}
           <div className="hidden lg:block">
-            <div className="rise relative aspect-[1528/2128] overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
+            <div
+              className="rise relative aspect-[1528/2128] overflow-hidden rounded-3xl border border-white/10 shadow-2xl"
+              style={{ animationDelay: "0.12s" }}
+            >
               <Image
                 src="/brand/hero-owner.png"
                 alt="Эксперт по финансированию KOVI Finance"
@@ -76,7 +82,7 @@ export default function Hero() {
         <dl className="mt-14 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-white/10 pt-10 md:grid-cols-[1.35fr_1fr_1fr_1fr]">
           {STATS.map((s) => (
             <div key={s.label}>
-              <dt className="text-3xl font-semibold tracking-tight text-gold-bright md:whitespace-nowrap md:text-4xl">
+              <dt className="text-3xl font-semibold tracking-tight text-gold-bright md:whitespace-nowrap md:text-4xl tabular-nums">
                 {s.num !== undefined ? (
                   <CountUp to={s.num} prefix={s.prefix ?? ""} suffix={s.suffix ?? ""} />
                 ) : (
