@@ -45,3 +45,8 @@ next-env.d.ts
 *.db
 *.db-journal
 prisma/dev.db*
+
+# local tooling configs (agent/IDE)
+.agents/
+.claude/
+.codex/
