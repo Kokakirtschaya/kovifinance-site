@@ -142,34 +142,34 @@ export default function Calculator() {
   }, [mode, credit, bg, days, factoring, facDays, leasing]);
 
   return (
-    <section id="calc" className="bg-paper-2/60 py-20 md:py-28">
+    <section id="calc" className="bg-ink py-20 text-paper md:py-28">
       <div className="mx-auto max-w-6xl px-5">
         <Reveal className="max-w-2xl">
-          <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">
-            Рассчитайте условия <span className="text-brand">за минуту</span>
+          <h2 className="text-3xl font-bold tracking-[-0.02em] text-white md:text-5xl">
+            Рассчитайте условия <span className="text-gold-bright">за минуту</span>
           </h2>
-          <p className="mt-4 text-lg text-muted">
+          <p className="mt-4 text-lg text-white/70">
             Кредит, банковская гарантия, факторинг и лизинг — в одном окне. Предварительный расчёт;
             точные условия подберём под ваш бизнес.
           </p>
         </Reveal>
 
         <Reveal className="mt-10">
-          <div className="rounded-3xl border border-black/[0.07] bg-white p-5 shadow-[var(--shadow-soft)] md:p-8">
+          <div className="rounded-3xl border border-white/10 bg-ink-2 p-5 shadow-2xl md:p-8">
             {/* Переключатель продукта */}
-            <div className="flex flex-wrap gap-1 rounded-2xl bg-paper-2 p-1 sm:inline-flex sm:rounded-full">
+            <div className="flex flex-wrap gap-1 rounded-2xl bg-white/5 p-1 sm:inline-flex sm:rounded-full">
               {MODES.map((m) => (
                 <button
                   key={m.key}
                   onClick={() => setMode(m.key)}
                   className={`relative rounded-full px-5 py-2 text-sm font-medium transition-colors ${
-                    mode === m.key ? "text-white" : "text-ink/70 hover:text-ink"
+                    mode === m.key ? "text-white" : "text-white/60 hover:text-white"
                   }`}
                 >
                   {mode === m.key && (
                     <motion.span
                       layoutId="calc-tab"
-                      className="absolute inset-0 rounded-full bg-ink"
+                      className="absolute inset-0 rounded-full bg-brand"
                       transition={{ type: "spring", stiffness: 400, damping: 32 }}
                     />
                   )}
@@ -361,7 +361,7 @@ export default function Calculator() {
                         }}
                       />
                     </div>
-                    <p className="text-xs text-muted">
+                    <p className="text-xs text-white/50">
                       {leaseRateType === "apr"
                         ? "Процентная ставка на сумму за вычетом аванса — как в кредите."
                         : "Удорожание от стоимости предмета за год — как считают лизинговые компании."}
@@ -371,7 +371,7 @@ export default function Calculator() {
               </div>
 
               {/* Результат */}
-              <div className="flex flex-col justify-between rounded-2xl bg-ink p-6 text-paper">
+              <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-brand-dark p-6 text-paper">
                 <div>
                   <p className="text-sm text-white/60">{result.label}</p>
                   <p className="mt-2 text-3xl font-semibold tracking-tight text-gold-bright md:text-4xl">
@@ -396,7 +396,7 @@ export default function Calculator() {
           </div>
         </Reveal>
 
-        <p className="mt-4 text-xs text-muted">
+        <p className="mt-4 text-xs text-white/50">
           Расчёт носит информационный характер и не является публичной офертой.
         </p>
       </div>
@@ -440,15 +440,15 @@ function NumberField({
 }) {
   return (
     <label className="block">
-      <span className="text-sm text-muted">{label}</span>
-      <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-black/10 bg-paper pr-2 transition-colors focus-within:border-brand">
+      <span className="text-sm text-white/60">{label}</span>
+      <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 pr-2 transition-colors focus-within:border-brand">
         {money ? (
           <input
             type="text"
             inputMode="numeric"
             value={fmt(value)}
             onChange={(e) => onChange(Number(e.target.value.replace(/\D/g, "") || 0))}
-            className="w-full bg-transparent px-4 py-2.5 text-sm font-medium outline-none"
+            className="w-full bg-transparent px-4 py-2.5 text-sm font-medium text-white outline-none"
           />
         ) : (
           <input
@@ -458,19 +458,19 @@ function NumberField({
             max={max}
             step={step}
             onChange={(e) => onChange(Number(e.target.value))}
-            className="w-full bg-transparent px-4 py-2.5 text-sm font-medium outline-none"
+            className="w-full bg-transparent px-4 py-2.5 text-sm font-medium text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
         )}
-        {suffix && <span className="whitespace-nowrap text-sm text-muted">{suffix}</span>}
+        {suffix && <span className="whitespace-nowrap text-sm text-white/50">{suffix}</span>}
         {suffixToggle && (
-          <div className="flex shrink-0 rounded-lg bg-paper-2 p-0.5">
+          <div className="flex shrink-0 rounded-lg bg-white/10 p-0.5">
             {suffixToggle.options.map((o) => (
               <button
                 key={o.key}
                 type="button"
                 onClick={() => suffixToggle.onChange(o.key)}
                 className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
-                  suffixToggle.value === o.key ? "bg-white text-ink shadow-sm" : "text-muted"
+                  suffixToggle.value === o.key ? "bg-white text-ink shadow-sm" : "text-white/50"
                 }`}
               >
                 {o.label}
@@ -487,7 +487,7 @@ function NumberField({
           step={step}
           value={Math.min(Math.max(value, min), max)}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="mt-3 w-full"
+          className="mt-3 w-full accent-brand"
         />
       )}
     </label>
@@ -507,15 +507,15 @@ function Toggle({
 }) {
   return (
     <div>
-      <span className="text-sm text-muted">{label}</span>
-      <div className="mt-1.5 inline-flex rounded-xl bg-paper-2 p-1">
+      <span className="text-sm text-white/60">{label}</span>
+      <div className="mt-1.5 inline-flex rounded-xl bg-white/10 p-1">
         {options.map((o) => (
           <button
             key={o.key}
             type="button"
             onClick={() => onChange(o.key)}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              value === o.key ? "bg-white text-ink shadow-sm" : "text-muted hover:text-ink"
+              value === o.key ? "bg-white text-ink shadow-sm" : "text-white/60 hover:text-white"
             }`}
           >
             {o.label}

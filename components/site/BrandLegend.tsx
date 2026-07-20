@@ -36,7 +36,7 @@ export default function BrandLegend() {
           </h2>
 
           <p className="mt-6 text-lg leading-relaxed text-white/70">
-            <b className="font-semibold text-white">Ков-</b> — древний славянский корень: ковать,
+            <b className="font-semibold text-white">Ков-</b>, древний славянский корень: ковать,
             чеканить. В сербском <i>kovati novac</i> — «чеканить деньги», а <i>kovnica</i> —
             монетный двор. В финском <i>kova</i> — «твёрдый», как в выражении «твёрдая валюта».
           </p>

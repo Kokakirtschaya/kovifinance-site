@@ -2,7 +2,6 @@ import Header from "@/components/site/Header";
 import Hero from "@/components/site/Hero";
 import TrustBar from "@/components/site/TrustBar";
 import Services from "@/components/site/Services";
-import Cases from "@/components/site/Cases";
 import Calculator from "@/components/site/Calculator";
 import Process from "@/components/site/Process";
 import Agents from "@/components/site/Agents";
@@ -41,7 +40,6 @@ export default function Home() {
         <Hero />
         <TrustBar />
         <Services />
-        <Cases />
         <Calculator />
         <Process />
         <Agents />

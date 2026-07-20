@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { STATS, CONTACTS } from "@/lib/site";
-import CountUp from "@/components/site/CountUp";
+import { CONTACTS } from "@/lib/site";
 import MagneticButton from "@/components/site/MagneticButton";
 
 export default function Hero() {
@@ -76,23 +75,6 @@ export default function Hero() {
             </div>
           </div>
         </div>
-
-        {/* Первой колонке места больше: «более 20 млрд ₽» вдвое длиннее соседей и при
-            равных долях не влезал — ~270px текста в 260px колонки, ₽ отрывался на строку ниже. */}
-        <dl className="mt-14 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-white/10 pt-10 md:grid-cols-[1.35fr_1fr_1fr_1fr]">
-          {STATS.map((s) => (
-            <div key={s.label}>
-              <dt className="text-3xl font-semibold tracking-tight text-gold-bright md:whitespace-nowrap md:text-4xl tabular-nums">
-                {s.num !== undefined ? (
-                  <CountUp to={s.num} prefix={s.prefix ?? ""} suffix={s.suffix ?? ""} />
-                ) : (
-                  s.text
-                )}
-              </dt>
-              <dd className="mt-1 text-sm text-white/60">{s.label}</dd>
-            </div>
-          ))}
-        </dl>
       </div>
     </section>
   );
