@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createLead } from "@/lib/crm";
+import { lookupInn } from "@/lib/checko";
 
 type Lead = {
   name?: string;
@@ -32,6 +33,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "validation" }, { status: 422 });
   }
 
+  // ИНН обязателен: проверяем формат/контрольную сумму и существование в Checko.
+  // Блокируем только явные фейки: юрлицо (10 цифр), которого нет в ЕГРЮЛ.
+  // 12-значный не найден — возможно физлицо без ИП, пропускаем с пометкой.
+  const innRaw = (body.inn ?? "").trim();
+  const innCheck = await lookupInn(innRaw);
+  if (innCheck.status === "invalid") {
+    return NextResponse.json({ ok: false, error: "inn_invalid" }, { status: 422 });
+  }
+  if (innCheck.status === "not_found" && innCheck.kind === "org") {
+    return NextResponse.json({ ok: false, error: "inn_not_found" }, { status: 422 });
+  }
+  const company = innCheck.status === "found" ? innCheck.name : "";
+  const innNotInRegistry = innCheck.status === "not_found";
+
   // Заголовок заявки: продукт с главной, либо тип объекта/залога с посадочных
   const title =
     (body.product ?? "").trim() ||
@@ -42,7 +57,7 @@ export async function POST(request: Request) {
   const amount = String(body.price ?? body.sum ?? "").trim();
   const source = (body.source ?? "").trim();
 
-  const lead = { name, phone, email, inn: (body.inn ?? "").trim(), title, amount, source };
+  const lead = { name, phone, email, inn: innRaw, company, title, amount, source };
 
   // 1) В CRM — создаёт сделку (клиент увидит её в ЛК, если указал e-mail)
   const crm = await createLead({
@@ -50,6 +65,7 @@ export async function POST(request: Request) {
     phone,
     email: email || undefined,
     inn: lead.inn || undefined,
+    company: company || undefined,
     title,
     amount: amount || undefined,
     source: source || undefined,
@@ -63,7 +79,11 @@ export async function POST(request: Request) {
       `🟢 Новая заявка с сайта${source ? ` (${source})` : ""}\n\n` +
       `👤 ${name}\n📞 ${phone}\n` +
       (email ? `✉️ ${email}\n` : "") +
-      (lead.inn ? `🏢 ИНН: ${lead.inn}\n` : "") +
+      (lead.inn
+        ? `🏢 ИНН: ${lead.inn}` +
+          (company ? ` — ${company}` : innNotInRegistry ? " — ⚠️ в реестре не найден" : "") +
+          "\n"
+        : "") +
       `💼 ${title}` +
       (amount ? `\n💰 ${amount}` : "") +
       `\n\n${crm.ok ? "✅ в CRM" : "⚠️ CRM недоступна — занести вручную"}`;

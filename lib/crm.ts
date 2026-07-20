@@ -22,6 +22,7 @@ export type LeadInput = {
   phone: string;
   email?: string;
   inn?: string;
+  company?: string; // название из Checko по ИНН, если найдено
   title?: string; // продукт/услуга
   amount?: string;
   source?: string; // с какой страницы
