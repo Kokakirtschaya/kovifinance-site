@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { NAV, CONTACTS } from "@/lib/site";
 import Socials from "@/components/site/Socials";
+import CabinetLink from "@/components/site/CabinetLink";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -46,6 +47,8 @@ export default function Header() {
             >
               {CONTACTS.phone}
             </a>
+            {/* На 1024–1280 вторая строка скрыта, поэтому вход в кабинет живёт здесь — знаком */}
+            <CabinetLink variant="icon" className="xl:hidden" />
             <a
               href={navHref("#lead")}
               className="whitespace-nowrap rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-dark"
@@ -53,8 +56,11 @@ export default function Header() {
               Оставить заявку
             </a>
           </div>
-          <div className="hidden xl:block">
+          {/* Кабинет — справа, ровно под кнопкой «Оставить заявку» */}
+          <div className="hidden items-center gap-3 xl:flex">
             <Socials />
+            <span className="h-4 w-px bg-black/10" aria-hidden="true" />
+            <CabinetLink />
           </div>
         </div>
 
@@ -93,6 +99,7 @@ export default function Header() {
             >
               Оставить заявку
             </a>
+            <CabinetLink variant="menu" onClick={() => setOpen(false)} />
             <Socials className="mt-3" />
           </nav>
         </div>

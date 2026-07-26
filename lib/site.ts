@@ -10,7 +10,7 @@ export const CONTACTS = {
   instagram: "https://www.instagram.com/kovi_finance/",
   legalName: "ИП Кирцхая Кока Зауриевич",
   inn: "772515515470",
-  policyUpdated: "05 июня 2026 г.",
+  policyUpdated: "25 июля 2026 г.",
 };
 
 export const NAV = [
@@ -18,7 +18,7 @@ export const NAV = [
   { label: "Калькулятор", href: "#calc" },
   { label: "Клиентам", href: "#process" },
   { label: "Агентам", href: "#agents" },
-  { label: "Команда", href: "#team" },
+  { label: "О компании", href: "#team" },
   { label: "Вопросы", href: "#faq" },
   { label: "Контакты", href: "#contacts" },
 ];

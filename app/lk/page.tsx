@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth, signIn, signOut } from "@/auth";
 import LoginForm from "@/app/lk/login-form";
 import { getApplications, type Application } from "@/lib/crm";
+import { CONTACTS } from "@/lib/site";
 
 const fmt = (n: string) => new Intl.NumberFormat("ru-RU").format(Number(n));
 const STEPS = ["Заявка принята", "В работе", "Подано в банк", "Решение банка"];
@@ -87,9 +88,44 @@ export default async function CabinetPage({
                 </>
               )}
             </div>
+
+            {/* Ст. 18 ч. 3 152-ФЗ: собирая e-mail напрямую у человека, оператор обязан
+                сразу назвать себя, цель обработки и права субъекта. */}
+            <PrivacyNotice />
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+// Короткое уведомление об обработке ПДн на экране входа: кто оператор,
+// зачем нужен e-mail, как отозвать согласие. Подробности — в Политике.
+function PrivacyNotice() {
+  return (
+    <div className="mt-5 text-[11px] leading-relaxed text-muted">
+      <p>
+        Отправляя адрес, вы соглашаетесь с обработкой персональных данных на условиях{" "}
+        <Link
+          href="/confidentiality"
+          className="underline underline-offset-2 hover:text-ink"
+        >
+          Политики конфиденциальности
+        </Link>
+        .
+      </p>
+      <p className="mt-2">
+        Оператор — {CONTACTS.legalName}, ИНН {CONTACTS.inn}. E-mail нужен только для отправки
+        ссылки для входа, узнавания вас в кабинете и показа статуса ваших заявок. Рекламных
+        писем без отдельного согласия не отправляем.
+      </p>
+      <p className="mt-2">
+        Отозвать согласие и удалить учётную запись — письмом на{" "}
+        <a href={CONTACTS.emailHref} className="underline underline-offset-2 hover:text-ink">
+          {CONTACTS.email}
+        </a>
+        , ответим в течение 10 рабочих дней.
+      </p>
     </div>
   );
 }
@@ -121,6 +157,18 @@ async function Cabinet({ email }: { email: string }) {
           Оформить новую
         </Link>
       </div>
+
+      <p className="mt-6 text-[11px] leading-relaxed text-muted">
+        Обработка данных — по{" "}
+        <Link href="/confidentiality" className="underline underline-offset-2 hover:text-ink">
+          Политике конфиденциальности
+        </Link>
+        . Чтобы удалить учётную запись и отозвать согласие, напишите на{" "}
+        <a href={CONTACTS.emailHref} className="underline underline-offset-2 hover:text-ink">
+          {CONTACTS.email}
+        </a>
+        .
+      </p>
     </div>
   );
 }

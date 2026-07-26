@@ -30,6 +30,27 @@ export default function Footer() {
                   </a>
                 </li>
               ))}
+              <li className="pt-2">
+                <a
+                  href="/lk"
+                  className="inline-flex items-center gap-2 text-gold-bright transition-colors hover:text-white"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8.5" r="3.6" />
+                    <path d="M4.6 20c1.4-3.6 4.1-5.4 7.4-5.4s6 1.8 7.4 5.4" />
+                  </svg>
+                  Личный кабинет
+                </a>
+              </li>
             </ul>
           </div>
 
