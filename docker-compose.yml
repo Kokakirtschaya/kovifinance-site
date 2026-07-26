@@ -1,0 +1,34 @@
+# Локальный PostgreSQL для разработки — замена прежнего SQLite-файла dev.db.
+# На проде та же роль у Managed PostgreSQL в Timeweb (152-ФЗ: ПДн в РФ),
+# провайдер один и тот же, поэтому миграции с локалки ложатся на прод один в один.
+#
+#   docker compose up -d      поднять базу
+#   docker compose down       остановить (данные останутся в томе)
+#   docker compose down -v    остановить и стереть данные
+#
+# Пароль здесь заведомо простой: база слушает только localhost и держит
+# тестовые данные. Боевые доступы живут в переменных окружения Timeweb.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: kovi-db-local
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kovi
+      POSTGRES_PASSWORD: kovi
+      POSTGRES_DB: kovi
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - kovi-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Без проверки готовности prisma migrate успевает постучаться раньше,
+      # чем Postgres поднимет сокет, и падает на ровном месте.
+      test: ["CMD-SHELL", "pg_isready -U kovi -d kovi"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  kovi-pgdata:

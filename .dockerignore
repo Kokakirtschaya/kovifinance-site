@@ -1,0 +1,30 @@
+# Всё, что не должно попасть в контекст сборки: либо пересобирается внутри,
+# либо содержит секреты, либо просто раздувает контекст.
+node_modules
+.next
+.git
+.vercel
+.claude
+.agents
+.codex
+
+# Секреты — на проде переменные задаются в панели Timeweb, не файлом.
+.env
+.env.*
+
+# Локальная база прежнего поколения (SQLite) и её артефакты.
+dev.db
+dev.db-journal
+
+# Мусор разработки.
+*.log
+.DS_Store
+tsconfig.tsbuildinfo
+scratchpad
+
+# Документация и исходники бренда — в рантайме не нужны.
+# ⚠️ assets/ НЕ исключаем: app/opengraph-image.tsx читает оттуда шрифт
+# golos-700.woff в рантайме через readFile(process.cwd() + "assets/...").
+brand-kit
+legal
+*.md

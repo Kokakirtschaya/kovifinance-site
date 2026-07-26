@@ -1,6 +1,8 @@
 // KOVI Finance — база аккаунтов личного кабинета.
-// Провайдер sqlite для локальной разработки; на проде — postgresql на РФ-сервере
-// (152-ФЗ: ПДн хранятся в России, как и в CRM). Модели совместимы с обоими.
+// PostgreSQL и локально, и на проде: на проде это Managed PostgreSQL в Timeweb
+// (152-ФЗ: ПДн хранятся в России, как и в CRM), локально — контейнер из
+// docker-compose.yml. Один провайдер на оба окружения, чтобы миграции,
+// прогнанные локально, один в один ложились на прод.
 
 generator client {
   provider = "prisma-client"
@@ -8,7 +10,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // ---------- Auth.js обязательные модели ----------
