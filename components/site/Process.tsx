@@ -9,8 +9,8 @@ const ADVANTAGES: Advantage[] = [
     decor: { src: "/decor/cash-register.svg", box: "w-[60%] max-h-[78%]" },
   },
   {
-    title: "40+ банков",
-    desc: "Подаём в несколько банков сразу и выбираем лучшие условия.",
+    title: "Знаем, куда подаваться",
+    desc: "Опыт сделок показывает, какой банк берётся за вашу отрасль и структуру. Туда и идём.",
     icon: "banks",
     decor: { src: "/decor/banks.svg", box: "w-[88%] max-h-[78%]" },
   },

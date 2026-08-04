@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   description:
     "Кредиты под залог квартиры, дома, офиса, склада или земли. До 2 млрд ₽, до 70% от стоимости объекта. Работаем с юрлицами, ИП и физлицами.",
   alternates: { canonical: "https://kovifinance.ru/zalogi_kred" },
+  // В первый запуск страница не публикуется — цифры не подтверждены. Снять при выкатке.
+  robots: { index: false, follow: false },
 };
 
 const schema = {

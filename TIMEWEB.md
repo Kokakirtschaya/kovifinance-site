@@ -36,32 +36,90 @@ https://timeweb.com/ (домены/регистратор). Это два раз
 может перестать отдавать DNS → сайт И почта лягут одновременно. Поэтому порядок такой:
 **сначала переносим DNS на Timeweb, и только потом — регистратора.**
 
-### 1.0. Текущие DNS-записи (выписаны заранее — их надо воссоздать 1-в-1)
+### 1.0. Текущие DNS-записи (сверено вживую 2026-08-04)
 
-| Тип | Имя/хост | Значение | Приоритет |
-|---|---|---|---|
-| A | `@` | `176.57.65.207` | — |
-| A | `www` | `176.57.65.207` | — |
-| MX | `@` | `mx.yandex.net.` | `10` |
-| TXT | `@` | `v=spf1 include:_spf.yandex.net ~all` | — |
-| TXT | `mail._domainkey` | `v=DKIM1; k=rsa; t=s; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDQ+ZgmBhmNH9dql6vSBgUMaOJu1lhPD3AekuY9xxKNvt1PviuSvuff+Z6E0ERRBLYmqqEBndjOuNzTTg8pQNkj4WU5m0MtlK8hYNccfZ3ul0BtmATo51xJ2PiAewbgoP1FP6JIDqmXpDjaKmleDI1R/7QS31KENaJ6+q8QtCbdCQIDAQAB` | — |
-| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:info@kovifinance.ru,mailto:r.zakirov@kovifinance.ru` | — |
+| Тип | Имя/хост | Значение | Приоритет | TTL |
+|---|---|---|---|---|
+| A | `@` | `176.57.65.207` | — | 900 |
+| CNAME | `www` | `kovifinance.ru.` | — | 900 |
+| MX | `@` | `mx.yandex.net.` | `10` | 900 |
+| TXT | `@` | `v=spf1 include:_spf.yandex.net ~all` | — | 900 |
+| TXT | `mail._domainkey` | `v=DKIM1; k=rsa; t=s; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDQ+ZgmBhmNH9dql6vSBgUMaOJu1lhPD3AekuY9xxKNvt1PviuSvuff+Z6E0ERRBLYmqqEBndjOuNzTTg8pQNkj4WU5m0MtlK8hYNccfZ3ul0BtmATo51xJ2PiAewbgoP1FP6JIDqmXpDjaKmleDI1R/7QS31KENaJ6+q8QtCbdCQIDAQAB` | — | 900 |
+| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:info@kovifinance.ru,mailto:r.zakirov@kovifinance.ru` | — | 900 |
 
-Перед началом ещё раз сверить актуальность: `dig NS/A/MX/TXT kovifinance.ru`.
+Правки против версии 2026-07-20: `www` — это **CNAME** на `kovifinance.ru.`, а не A-запись с IP.
+DKIM = 240 символов, влезает в одну TXT-строку (лимит 255) — разбивать не нужно.
+
+⚠️ **`dig` показывает только то, что мы спросили.** Источник истины — **панель Тильды**:
+там могут быть записи, о которых мы не знаем (проверочные TXT Яндекса, поддомены,
+`CAA`). Открыть список записей в Тильде и переписать **все** — таблица выше только
+для сверки. Проверено: `CAA`, `AAAA`, `mail`, `webmail`, `autodiscover`,
+`yandex._domainkey`, `_domainconnect` — пусты.
+
 A-запись `176.57.65.207` пока оставляем на Тильду (сайт живёт там до этапа 7).
 
 ### 1.1. Создать DNS-зону в Timeweb и продублировать ВСЕ записи
-1. https://timeweb.cloud/ → **«DNS» / «Домены»** → добавить зону `kovifinance.ru`.
-2. Внести все записи из таблицы 1.0 ровно как есть (особенно MX/SPF/DKIM/DMARC Яндекса).
-3. Записать выданные Timeweb имена его NS-серверов (вида `ns1.timeweb.ru` / `ns2.timeweb.ru`).
-4. Пока НЕ переключать — просто зона готова.
+
+1. https://timeweb.cloud/ → раздел **«Домены»** (или «DNS»).
+2. Добавить `kovifinance.ru` как **внешний домен** — он зарегистрирован не в Timeweb,
+   нужен режим «домен у другого регистратора / только управление DNS». Если такого
+   пункта в интерфейсе нет — написать в поддержку Timeweb, сценарий стандартный.
+3. **Удалить автоматически созданные записи-заглушки.** Timeweb при создании зоны обычно
+   заводит свои A/CNAME на парковку — если их оставить, после смены NS сайт уедет на
+   заглушку Timeweb вместо Тильды.
+4. Внести все записи из таблицы 1.0. На что смотреть:
+   - в поле «значение» MX и CNAME — **точка в конце** (`mx.yandex.net.`), иначе панель
+     достроит имя до `mx.yandex.net.kovifinance.ru`;
+   - MX-приоритет `10` — отдельное поле;
+   - имя хоста для DKIM — ровно `mail._domainkey` (панель сама допишет домен);
+   - SPF/DKIM/DMARC вводить **без внешних кавычек** — панель добавит их сама.
+5. Записать выданные Timeweb имена его NS-серверов — они показаны в свойствах зоны
+   (обычно вида `ns1.timeweb.ru`, `ns2.timeweb.ru`, `ns3.timeweb.org`, `ns4.timeweb.org`,
+   но брать **ровно те, что показала панель**, а не эти).
+
+**Проверка ДО переключения** — можно спросить сервер Timeweb напрямую, он ответит из
+новой зоны, хотя делегирование ещё на Тильде. Подставить свой NS из шага 5:
+
+```bash
+NS=ns1.timeweb.ru   # ← имя из панели
+dig @$NS kovifinance.ru A     +noall +answer
+dig @$NS www.kovifinance.ru   CNAME +noall +answer
+dig @$NS kovifinance.ru MX    +noall +answer
+dig @$NS kovifinance.ru TXT   +noall +answer
+dig @$NS mail._domainkey.kovifinance.ru TXT +noall +answer
+dig @$NS _dmarc.kovifinance.ru TXT +noall +answer
+```
+
+Ответы обязаны совпадать с таблицей 1.0 **до символа**. Пока не совпали — NS не трогать.
 
 ### 1.2. Сменить NS у домена на Timeweb (в панели Тильды)
-1. В Tilda → «Домены» → `kovifinance.ru` → настройки **NS / DNS-серверы**.
-2. Заменить `ns1/ns2.tildadns.com` на NS-серверы Timeweb из шага 1.1.
-3. Подождать делегирование (2–24 ч). Проверить: `dig NS kovifinance.ru` = Timeweb.
-4. ПРОВЕРИТЬ, что сайт открывается И почта ходит (отправить/принять письмо на
-   info@kovifinance.ru). Теперь DNS не зависит от Тильды.
+
+1. Личный кабинет Tilda → **«Домены»** → `kovifinance.ru` → настройки **NS / DNS-серверы**.
+2. Заменить `ns1.tildadns.com` / `ns2.tildadns.com` на NS Timeweb из шага 1.1
+   (внести **все** выданные, не два из четырёх).
+3. Ждать делегирование: обычно 15 мин – 4 ч, по регламенту до 24 ч.
+
+**Как понять, что переключилось** (реестр .RU — источник истины):
+
+```bash
+whois kovifinance.ru | grep nserver     # должны быть NS Timeweb
+dig NS kovifinance.ru +short            # то же, но из кеша резолвера
+```
+
+4. **Проверить, что ничего не отвалилось:**
+   - `curl -sI https://kovifinance.ru | head -1` → сайт на Тильде по-прежнему отвечает;
+   - `dig kovifinance.ru MX +short` → `10 mx.yandex.net.`;
+   - **письмо снаружи на `info@kovifinance.ru` дошло** (с личной почты, не с домена);
+   - **письмо из `info@kovifinance.ru` наружу ушло** и в заголовках получателя
+     `spf=pass` и `dkim=pass` (в Gmail: «Показать оригинал»).
+
+Пока пункт про почту не проверен — **дальше не идти**. Это единственный шаг, где можно
+уронить почту, и чинится он мгновенно только пока помнишь, что менял.
+
+**Откат:** вернуть в Тильде прежние NS `ns1.tildadns.com` / `ns2.tildadns.com`.
+Зона Тильды никуда не делась, всё вернётся за то же время делегирования.
+
+После успеха DNS больше не зависит от Тильды — можно спокойно переносить регистратора (1.3).
 
 ### 1.3. Перенести регистратора Tilda → Timeweb (.RU)
 Для .RU процедура — «смена регистратора» (не всегда через auth-code, как у .com):

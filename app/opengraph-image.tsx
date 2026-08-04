@@ -48,7 +48,7 @@ export default async function OG() {
             <span style={{ color: "#FFD23F" }}>быстро</span>
           </div>
           <div style={{ fontSize: 30, color: "rgba(251,250,247,0.7)", marginTop: 24 }}>
-            Кредиты · Гарантии · Факторинг · Лизинг · 40+ банков
+            Кредиты · Гарантии · Факторинг · Лизинг
           </div>
         </div>
 

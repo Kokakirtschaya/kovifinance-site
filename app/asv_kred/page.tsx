@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description:
     "Деньги на участие в торгах АСВ под залог вашей недвижимости. До 70% от стоимости залога, до 500 млн ₽, решение за 3 дня. Имущество банков-банкротов на 20–30% ниже рынка.",
   alternates: { canonical: "https://kovifinance.ru/asv_kred" },
+  // В первый запуск страница не публикуется — цифры не подтверждены. Снять при выкатке.
+  robots: { index: false, follow: false },
 };
 
 const schema = {

@@ -32,7 +32,7 @@ export default function Hero() {
 
             <p className="rise mt-6 max-w-xl text-lg text-white/70" style={{ animationDelay: "0.14s" }}>
               Подберём кредит, гарантию, факторинг или лизинг на выгодных условиях. Работаем
-              с 40+ банками. Заявка — 5 минут, решение — от 3 дней. Оплата только за результат.
+              исключительно с банками. Заявка — 5 минут, решение — от 3 дней. Оплата только за результат.
             </p>
 
             <div className="rise mt-8 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "0.21s" }}>
