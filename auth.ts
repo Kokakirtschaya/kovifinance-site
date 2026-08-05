@@ -49,7 +49,56 @@ const magicLink: Provider = {
   from: "no-reply@kovifinance.ru",
   maxAge: 15 * 60, // ссылка живёт 15 минут
   async sendVerificationRequest({ identifier, url }) {
-    // SMTP задан → шлём настоящее письмо; иначе (локалка) — ссылка в консоль
+    const subject = "Вход в личный кабинет KOVI Finance";
+    const text = `Ссылка для входа (действует 15 минут):\n${url}`;
+
+    // Первый приоритет — HTTP API Unisender Go.
+    //
+    // Почему не SMTP: из приложения на Timeweb исходящие подключения к
+    // smtp.yandex.ru:465 и :587 висят до таймаута (~120 с) и обрываются, при этом
+    // ни одного ответа SMTP-уровня — соединение не устанавливается вовсе.
+    // HTTPS с того же контейнера работает штатно (проверено запросом к Checko),
+    // поэтому отправка через обычный порт 443 обходит проблему целиком.
+    // Сервис российский — адреса получателей, а это ПДн, не покидают РФ.
+    if (process.env.UNISENDER_API_KEY) {
+      const res = await fetch(
+        "https://goapi.unisender.ru/ru/transactional/api/v1/email/send.json",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-API-KEY": process.env.UNISENDER_API_KEY,
+          },
+          body: JSON.stringify({
+            message: {
+              recipients: [{ email: identifier }],
+              subject,
+              body: { html: loginEmailHtml(url), plaintext: text },
+              from_email: process.env.EMAIL_FROM ?? "info@kovifinance.ru",
+              from_name: "KOVI Finance",
+            },
+          }),
+        },
+      );
+
+      const data = await res.json().catch(() => null);
+      // Сервис отвечает 200 и при отказе конкретному адресу, поэтому мало
+      // проверить res.ok — нужен status в теле и пустой failed_emails.
+      if (!res.ok || data?.status !== "success") {
+        throw new Error(
+          `Unisender Go не принял письмо (HTTP ${res.status}): ${JSON.stringify(data)}`,
+        );
+      }
+      const failed = data.failed_emails ?? {};
+      if (Object.keys(failed).length > 0) {
+        throw new Error(`Unisender Go отклонил адрес: ${JSON.stringify(failed)}`);
+      }
+      return;
+    }
+
+    // Запасной путь: если ключа нет, а SMTP задан — шлём по SMTP.
+    // Пригодится, когда Timeweb починит маршрут и захочется вернуться на Яндекс.
     if (process.env.SMTP_HOST) {
       const transport = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -60,8 +109,8 @@ const magicLink: Provider = {
       const info = await transport.sendMail({
         to: identifier,
         from: process.env.EMAIL_FROM ?? process.env.SMTP_USER,
-        subject: "Вход в личный кабинет KOVI Finance",
-        text: `Ссылка для входа (действует 15 минут):\n${url}`,
+        subject,
+        text,
         html: loginEmailHtml(url),
       });
       // Для тестового ящика Ethereal — ссылка на просмотр письма; для реального SMTP = false
