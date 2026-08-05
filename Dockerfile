@@ -40,6 +40,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 
+# curl нужен проверке здоровья. Timeweb при старте подменяет контейнер и
+# подставляет свой healthcheck, который дёргает curl — а в node:22-alpine его нет.
+# Без него проверка падает с «команда не найдена», Docker бесконечно держит
+# статус starting, и деплой отваливается по таймауту, хотя приложение работает.
+RUN apk add --no-cache curl
+
 RUN addgroup -S -g 1001 nodejs && adduser -S -u 1001 -G nodejs nextjs
 
 # standalone не копирует public и .next/static сам — это делаем руками,
@@ -78,6 +84,12 @@ RUN chmod +x ./docker-entrypoint.sh
 
 USER nextjs
 EXPOSE 3000
+
+# Своя проверка здоровья — на случай, если платформа не подставит собственную.
+# start-period даёт время на миграции при первом старте: без него контейнер
+# признают больным раньше, чем он успеет подняться.
+HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=5 \
+  CMD curl -fsS http://127.0.0.1:3000/robots.txt || exit 1
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["node", "server.js"]
