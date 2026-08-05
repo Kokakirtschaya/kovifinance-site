@@ -77,6 +77,12 @@ const magicLink: Provider = {
               body: { html: loginEmailHtml(url), plaintext: text },
               from_email: process.env.EMAIL_FROM ?? "info@kovifinance.ru",
               from_name: "KOVI Finance",
+              // Подмену ссылок на трекинговые отключаем намеренно. Ссылка входа
+              // одноразовая, а почтовые фильтры и антивирусы сами открывают ссылки
+              // в письмах для проверки — такой переход сожжёт токен, и клиент,
+              // перейдя следом, получит ошибку. Статистика кликов тут не нужна.
+              track_links: 0,
+              track_read: 0,
             },
           }),
         },
