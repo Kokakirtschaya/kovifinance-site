@@ -23,7 +23,25 @@ function getClient(): PrismaClient {
     throw new Error("DATABASE_URL не задан — личный кабинет не сможет подключиться к базе");
   }
 
-  client = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  // Managed PostgreSQL в Timeweb отдаёт сертификат, подписанный собственным CA.
+  // pg такому не доверяет и рвёт соединение с «self-signed certificate», из-за чего
+  // валится любой запрос Prisma — а Auth.js показывает это как error=Configuration,
+  // будто сломана почта. Проверку сертификата отключаем, но только когда строка
+  // подключения сама просит SSL: у локального Postgres его нет, и передавать туда
+  // ssl-опции нельзя — соединение не установится.
+  //
+  // Канал при этом остаётся шифрованным, теряется только проверка подлинности
+  // сертификата. Приемлемо: база доступна лишь по приватной сети Timeweb
+  // (192.168.0.4) и наружу не смотрит. Правильное решение — подложить CA-сертификат
+  // Timeweb, но его сначала нужно получить в поддержке.
+  const wantsSsl = /[?&]sslmode=(require|verify-ca|verify-full)/.test(connectionString);
+
+  client = new PrismaClient({
+    adapter: new PrismaPg({
+      connectionString,
+      ...(wantsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
+    }),
+  });
   if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = client;
   return client;
 }
