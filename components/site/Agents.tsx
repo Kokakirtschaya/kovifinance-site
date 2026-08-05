@@ -25,7 +25,8 @@ export default function Agents() {
       className="bg-paper-2/60"
       title={
         <>
-          Два шага до <span className="text-brand">получения комиссии</span>
+          <span className="text-brand">Агентам</span>. Два шага до{" "}
+          <span className="text-brand">получения комиссии</span>
         </>
       }
       subtitle="Берём на себя переговоры с клиентом. Вы занимаетесь в это время своим бизнесом и поиском новых клиентов. После закрытия сделки получаете комиссию."

@@ -34,7 +34,8 @@ export default function Process() {
       id="process"
       title={
         <>
-          Четыре шага до <span className="text-brand">финансирования</span>
+          <span className="text-brand">Клиентам</span>. Четыре шага до{" "}
+          <span className="text-brand">финансирования</span>
         </>
       }
       subtitle="Берём на себя переговоры с банком или находим вам инвестора. Вы занимаетесь в это время своим бизнесом."
