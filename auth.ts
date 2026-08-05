@@ -25,6 +25,10 @@ function loginEmailHtml(url: string): string {
               Войти в кабинет
             </a>
             <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#8a94a0">
+              Если кнопка не сработала, скопируйте ссылку в адресную строку:<br>
+              <span style="color:#5b6672;word-break:break-all">${url}</span>
+            </p>
+            <p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:#8a94a0">
               Если вы не запрашивали вход — просто проигнорируйте это письмо.
             </p>
           </td></tr>
