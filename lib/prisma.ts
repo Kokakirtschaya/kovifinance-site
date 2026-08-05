@@ -34,11 +34,21 @@ function getClient(): PrismaClient {
   // сертификата. Приемлемо: база доступна лишь по приватной сети Timeweb
   // (192.168.0.4) и наружу не смотрит. Правильное решение — подложить CA-сертификат
   // Timeweb, но его сначала нужно получить в поддержке.
-  const wantsSsl = /[?&]sslmode=(require|verify-ca|verify-full)/.test(connectionString);
+  // ⚠️ Просто добавить ssl в конфиг недостаточно: pg разбирает строку подключения
+  // ПОСЛЕ и накрывает ею явные опции — `Object.assign({}, config, parse(connectionString))`
+  // в connection-parameters.js. Поэтому sslmode из URL побеждает, и rejectUnauthorized
+  // до драйвера не доходит. Значит, sslmode нужно из строки убрать.
+  //
+  // Из DATABASE_URL его не выкидываем: ту же переменную читает `prisma migrate deploy`
+  // при старте контейнера, у него отдельный движок со своими правилами разбора.
+  const url = new URL(connectionString);
+  const sslmode = url.searchParams.get("sslmode");
+  const wantsSsl = sslmode !== null && sslmode !== "disable";
+  url.searchParams.delete("sslmode");
 
   client = new PrismaClient({
     adapter: new PrismaPg({
-      connectionString,
+      connectionString: url.toString(),
       ...(wantsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
     }),
   });
