@@ -1,33 +1,66 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 
+/**
+ * Появление блока при прокрутке.
+ *
+ * Раньше здесь был whileInView из motion — и на Safari блоки оставались невидимыми
+ * до первого движения мыши: проверка видимости не срабатывала сама, страница висела
+ * белой. Теперь наблюдаем сами: IntersectionObserver сообщает о состоянии сразу,
+ * как только начинает следить, поэтому видимые блоки показываются в первом же кадре.
+ *
+ * Сама анимация — на CSS (globals.css, правила для [data-reveal]). Сервер отдаёт
+ * разметку без скрытия: контент прячется только когда JS точно жив (класс .js),
+ * иначе страница осталась бы пустой при любом сбое скриптов.
+ */
 export default function Reveal({
   children,
   delay = 0,
-  y = 18,
   className = "",
 }: {
   children: React.ReactNode;
   delay?: number;
-  y?: number;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState(false);
 
-  // reduced-motion: контент виден сразу, без движения
-  if (reduce) return <div className={className}>{children}</div>;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    // reduced-motion: показываем сразу, без движения
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShown(true);
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setShown(true);
+            io.disconnect();
+          }
+        }
+      },
+      { rootMargin: "-12% 0px" },
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <motion.div
+    <div
+      ref={ref}
       data-reveal
+      data-shown={shown ? "" : undefined}
       className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-12% 0px" }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay }}
+      style={delay ? { transitionDelay: `${delay}s` } : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

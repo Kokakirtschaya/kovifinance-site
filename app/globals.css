@@ -27,13 +27,29 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Контент не должен зависеть от того, ожил ли JS. Reveal отдаётся сервером с
-   opacity: 0, и если гидратация не прошла, страница остаётся белой. Скрипт в
-   layout ставит .js сразу и .reveal-fallback, если React не отметился за 3 с. */
-html:not(.js) [data-reveal],
+/* Появление блоков при прокрутке (компонент Reveal).
+   Скрываем ТОЛЬКО когда JS точно жив: класс .js ставит скрипт в layout синхронно.
+   Не ожил — контент виден, страница не белая. Показ включает Reveal, добавляя
+   data-shown, а .reveal-fallback — страховка, если и он почему-то промолчал. */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+html.js [data-reveal][data-shown],
 html.reveal-fallback [data-reveal] {
-  opacity: 1 !important;
-  transform: none !important;
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* Якоря (#services и т.п.) — сдвиг из-под липкой шапки (h-16 = 64px + воздух).

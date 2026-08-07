@@ -66,7 +66,7 @@ export default function RootLayout({
             проверяет, отметился ли React классом hydrated; не отметился — показываем всё. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!d.classList.contains('hydrated'))d.classList.add('reveal-fallback')},3000)})()`,
+            __html: `(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!d.classList.contains('hydrated'))d.classList.add('reveal-fallback')},1200)})()`,
           }}
         />
         <HydrationFlag />
