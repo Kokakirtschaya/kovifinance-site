@@ -35,28 +35,14 @@ html {
    animation-timeline: view() привязывает анимацию к прокрутке. Браузер без
    поддержки просто игнорирует это свойство — тогда анимация играет один раз
    при загрузке. В обоих случаях конечное состояние (both) — блок ВИДЕН. */
-@keyframes reveal-in {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-[data-reveal] {
-  animation: reveal-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-timeline: view();
-  animation-range: entry 0% cover 30%;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal] {
-    animation: none;
-  }
-}
+/* Анимации появления здесь БОЛЬШЕ НЕТ — и это осознанно.
+   Перебрали три механизма: whileInView (motion), свой IntersectionObserver и
+   scroll-driven animation-timeline: view(). Каждый по-своему оставлял блоки
+   невидимыми на Safari — страница белела, хотя DOM был полный. Цена эффекта
+   оказалась выше самого эффекта: главная страница боевого сайта не должна
+   зависеть от того, разморозил ли браузер вкладку и как он понял CSS-новинку.
+   [data-reveal] сохранён как разметочный маркер: если решим вернуть анимацию,
+   делать это только с состоянием «видно» по умолчанию. */
 
 /* Якоря (#services и т.п.) — сдвиг из-под липкой шапки (h-16 = 64px + воздух).
    Раньше это делал Lenis через offset: -80. От самого Lenis отказались:
