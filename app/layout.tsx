@@ -60,13 +60,14 @@ export default function RootLayout({
           {/* Без JS whileInView не срабатывает — принудительно показываем reveal-контент */}
           <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
-        {/* Страховка от белой страницы: сервер отдаёт reveal-блоки с opacity: 0, и если
-            JS не оживёт (упал бандл, оборвалась сеть, ошибка стороннего скрипта),
-            показывать их будет некому. Скрипт ставит класс js сразу, а через 3 секунды
-            проверяет, отметился ли React классом hydrated; не отметился — показываем всё. */}
+        {/* Страховка от белой страницы. Класс js ставится сразу — только под ним CSS
+            прячет reveal-блоки, иначе при мёртвых скриптах страница была бы пустой.
+            Через 1.5 с проверяем результат по факту: показан ли хоть один блок.
+            Проверять «ожил ли React» недостаточно — 7 августа он оживал (класс
+            hydrated стоял), а блоки всё равно висели невидимыми до движения мыши. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!d.classList.contains('hydrated'))d.classList.add('reveal-fallback')},1200)})()`,
+            __html: `(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!document.querySelector('[data-reveal][data-shown]'))d.classList.add('reveal-fallback')},1500)})()`,
           }}
         />
         <HydrationFlag />

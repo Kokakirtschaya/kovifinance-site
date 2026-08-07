@@ -36,6 +36,15 @@ export default function Reveal({
       return;
     }
 
+    // Сначала смотрим сами: если блок уже на экране, показываем немедленно.
+    // Не полагаемся на наблюдателя — на Safari он молчал до движения мыши,
+    // и страница оставалась белой, хотя React был жив.
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.88 && rect.bottom > 0) {
+      setShown(true);
+      return;
+    }
+
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
