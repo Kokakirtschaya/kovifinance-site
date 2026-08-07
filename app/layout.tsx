@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Golos_Text, Inter } from "next/font/google";
 import "./globals.css";
 import ScrollProgress from "@/components/site/ScrollProgress";
+import HydrationFlag from "@/components/site/HydrationFlag";
 import CookieBanner from "@/components/site/CookieBanner";
 import YandexMetrica from "@/components/site/YandexMetrica";
 
@@ -59,6 +60,16 @@ export default function RootLayout({
           {/* Без JS whileInView не срабатывает — принудительно показываем reveal-контент */}
           <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
+        {/* Страховка от белой страницы: сервер отдаёт reveal-блоки с opacity: 0, и если
+            JS не оживёт (упал бандл, оборвалась сеть, ошибка стороннего скрипта),
+            показывать их будет некому. Скрипт ставит класс js сразу, а через 3 секунды
+            проверяет, отметился ли React классом hydrated; не отметился — показываем всё. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!d.classList.contains('hydrated'))d.classList.add('reveal-fallback')},3000)})()`,
+          }}
+        />
+        <HydrationFlag />
         <ScrollProgress />
         {children}
         <CookieBanner />

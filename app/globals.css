@@ -27,6 +27,15 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Контент не должен зависеть от того, ожил ли JS. Reveal отдаётся сервером с
+   opacity: 0, и если гидратация не прошла, страница остаётся белой. Скрипт в
+   layout ставит .js сразу и .reveal-fallback, если React не отметился за 3 с. */
+html:not(.js) [data-reveal],
+html.reveal-fallback [data-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 /* Якоря (#services и т.п.) — сдвиг из-под липкой шапки (h-16 = 64px + воздух).
    Раньше это делал Lenis через offset: -80. От самого Lenis отказались:
    его rAF-цикл замирал в неактивной вкладке, страница оставалась с классом
