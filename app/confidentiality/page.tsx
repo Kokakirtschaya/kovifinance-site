@@ -30,7 +30,9 @@ export default function ConfidentialityPage() {
           <p className="text-sm font-semibold uppercase tracking-widest text-brand">
             Правовая информация
           </p>
-          <h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight md:text-4xl">
+          {/* На 320px «конфиденциальности» в 30px не влезает в строку и вылезает
+              за экран — отсюда меньший кегль на узких и перенос по слогам (lang="ru"). */}
+          <h1 className="mt-3 hyphens-auto text-2xl font-semibold leading-tight tracking-tight sm:text-3xl md:text-4xl">
             Политика конфиденциальности и обработки персональных данных
           </h1>
           <p className="mt-4 text-sm text-muted">
