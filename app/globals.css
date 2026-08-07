@@ -27,19 +27,12 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Lenis (плавный скролл) */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-.lenis.lenis-stopped {
-  overflow: hidden;
+/* Якоря (#services и т.п.) — сдвиг из-под липкой шапки (h-16 = 64px + воздух).
+   Раньше это делал Lenis через offset: -80. От самого Lenis отказались:
+   его rAF-цикл замирал в неактивной вкладке, страница оставалась с классом
+   .lenis-stopped и overflow: hidden — прокрутка умирала до перезагрузки. */
+[id] {
+  scroll-margin-top: 80px;
 }
 
 body {

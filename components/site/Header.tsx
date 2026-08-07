@@ -10,7 +10,8 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  // На главной оставляем якорь «#services» — его перехватывает Lenis и плавно прокручивает.
+  // На главной оставляем якорь «#services» — браузер плавно прокручивает сам
+  // (scroll-behavior: smooth + scroll-margin-top в globals.css).
   // На подстраницах такого блока нет, поэтому ссылка должна вести на главную: «/#services».
   const isHome = pathname === "/";
   const navHref = (href: string) => (isHome ? href : `/${href}`);

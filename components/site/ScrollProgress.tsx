@@ -8,8 +8,7 @@ import { motion, useScroll, useSpring } from "motion/react";
  */
 export default function ScrollProgress() {
   const { scrollYProgress } = useScroll();
-  // Пружина, а не сырое значение: с Lenis прокрутка идёт рывками по кадрам,
-  // и полоска без сглаживания дёргается.
+  // Пружина, а не сырое значение: полоска без сглаживания дёргается на быстрой прокрутке.
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 200,
     damping: 40,

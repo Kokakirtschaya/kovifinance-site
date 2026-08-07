@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Golos_Text, Inter } from "next/font/google";
 import "./globals.css";
-import SmoothScroll from "@/components/site/SmoothScroll";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import CookieBanner from "@/components/site/CookieBanner";
 import YandexMetrica from "@/components/site/YandexMetrica";
@@ -60,7 +59,6 @@ export default function RootLayout({
           {/* Без JS whileInView не срабатывает — принудительно показываем reveal-контент */}
           <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
-        <SmoothScroll />
         <ScrollProgress />
         {children}
         <CookieBanner />

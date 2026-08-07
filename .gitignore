@@ -50,3 +50,7 @@ prisma/dev.db*
 .agents/
 .claude/
 .codex/
+
+# личные рабочие файлы в корне
+*.docx
+~$*
