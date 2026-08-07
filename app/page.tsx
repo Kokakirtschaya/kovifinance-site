@@ -11,6 +11,7 @@ import FAQ from "@/components/site/FAQ";
 import LeadForm from "@/components/site/LeadForm";
 import Footer from "@/components/site/Footer";
 import StickyCTA from "@/components/site/StickyCTA";
+import ActiveSection from "@/components/site/ActiveSection";
 import { CONTACTS } from "@/lib/site";
 
 const schema = {
@@ -50,6 +51,7 @@ export default function Home() {
       </main>
       <Footer />
       <StickyCTA />
+      <ActiveSection />
     </>
   );
 }
