@@ -28,8 +28,12 @@ export default function Team() {
           </p>
         </Reveal>
 
-        <Reveal className="mt-12">
-          <div className="grid overflow-hidden rounded-3xl border border-white/15 bg-white/[0.06] shadow-[var(--shadow-lift)] backdrop-blur-md md:grid-cols-[0.85fr_1.15fr]">
+        {/* Карточку НЕ оборачиваем в Reveal: пока у предка анимируется opacity,
+            браузер изолирует его в отдельный слой и backdrop-filter не работает —
+            стекло секунду стоит прозрачным, а размывается только после анимации.
+            Подложка плотная (ink/35), чтобы вид не зависел от поддержки фильтра. */}
+        <div className="mt-12">
+          <div className="grid overflow-hidden rounded-3xl border border-white/15 bg-ink/35 shadow-[var(--shadow-lift)] backdrop-blur-md md:grid-cols-[0.85fr_1.15fr]">
             {/* Портрет основателя. Портретная пропорция колонки (4:5) под пропорции
                 самого фото — иначе object-cover «зумит» лицо в почти-квадрат. */}
             <div className="relative aspect-[4/5] bg-brand-dark">
@@ -63,7 +67,7 @@ export default function Team() {
               </a>
             </div>
           </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );
