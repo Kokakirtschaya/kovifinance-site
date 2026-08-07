@@ -14,7 +14,7 @@ export default function Team() {
   return (
     <section id="team" className="relative overflow-hidden py-20 md:py-28">
       {/* Фон-офис под тёмной вуалью — читаемость держит матовое стекло карточки. */}
-      <Image src="/team/office.png" alt="" aria-hidden fill sizes="100vw" className="object-cover" />
+      <Image src="/team/office.jpg" alt="" aria-hidden fill sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-b from-ink/90 via-ink/70 to-ink/40" />
 
       <div className="relative mx-auto max-w-6xl px-5">
@@ -39,7 +39,7 @@ export default function Team() {
                 самого фото — иначе object-cover «зумит» лицо в почти-квадрат. */}
             <div className="relative aspect-[4/5] bg-brand-dark">
               <Image
-                src="/brand/founder.png"
+                src="/brand/founder.jpg"
                 alt="Кирцхая Кока — основатель KOVI Finance"
                 fill
                 sizes="(min-width: 768px) 40vw, 100vw"

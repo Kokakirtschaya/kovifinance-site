@@ -68,7 +68,7 @@ export default function Hero() {
               style={{ animationDelay: "0.12s" }}
             >
               <Image
-                src="/brand/hero-owner.png"
+                src="/brand/hero-owner.jpg"
                 alt="Эксперт по финансированию KOVI Finance"
                 fill
                 sizes="45vw"
