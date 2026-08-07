@@ -5,15 +5,18 @@ import MagneticButton from "@/components/site/MagneticButton";
 export default function Hero() {
   return (
     <section id="top" className="relative overflow-hidden bg-ink text-paper">
-      {/* градиентная глубина */}
+      {/* Градиентная глубина одним слоем. Раньше здесь были два круга под
+          blur-3xl (радиус 64px на 560px) — каждый заставлял Safari держать
+          отдельный буфер размытия и, судя по всему, участвовал в обвале
+          отрисовки страницы в белое. Готовые радиальные градиенты дают тот же
+          вид, но рисуются без фильтров. */}
       <div className="grain pointer-events-none absolute inset-0 opacity-60" />
       <div
-        className="pointer-events-none absolute -top-40 right-0 h-[560px] w-[560px] rounded-full opacity-30 blur-3xl"
-        style={{ background: "radial-gradient(circle, #1e7a57 0%, transparent 70%)" }}
-      />
-      <div
-        className="pointer-events-none absolute -bottom-48 -left-32 h-[520px] w-[520px] rounded-full opacity-[0.12] blur-3xl"
-        style={{ background: "radial-gradient(circle, #d4a017 0%, transparent 70%)" }}
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(60% 45% at 100% 0%, rgba(30,122,87,0.30) 0%, transparent 70%), radial-gradient(55% 45% at 0% 100%, rgba(212,160,23,0.12) 0%, transparent 70%)",
+        }}
       />
       <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-12 md:pt-20">
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">

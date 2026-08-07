@@ -17,7 +17,7 @@ export default function Header() {
   const navHref = (href: string) => (isHome ? href : `/${href}`);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/5 bg-paper/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-black/5 bg-paper/95">
       <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-4 px-5 py-2.5">
         <a href={isHome ? "#top" : "/"} className="flex shrink-0 items-center" aria-label="KOVI Finance — на главную">
           {/* eslint-disable-next-line @next/next/no-img-element */}

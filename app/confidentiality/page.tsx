@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function ConfidentialityPage() {
   return (
     <>
-      <header className="border-b border-black/5 bg-paper/80 backdrop-blur-md">
+      <header className="border-b border-black/5 bg-paper/95">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5">
           <Link href="/" className="flex items-center" aria-label="KOVI Finance — на главную">
             {/* eslint-disable-next-line @next/next/no-img-element */}

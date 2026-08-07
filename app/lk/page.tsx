@@ -20,7 +20,7 @@ export default async function CabinetPage({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b border-black/5 bg-paper/80 backdrop-blur-md">
+      <header className="border-b border-black/5 bg-paper/95">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
           <Link href="/" className="flex items-center" aria-label="KOVI Finance">
             {/* eslint-disable-next-line @next/next/no-img-element */}
