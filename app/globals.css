@@ -27,28 +27,34 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Появление блоков при прокрутке (компонент Reveal).
-   Скрываем ТОЛЬКО когда JS точно жив: класс .js ставит скрипт в layout синхронно.
-   Не ожил — контент виден, страница не белая. Показ включает Reveal, добавляя
-   data-shown, а .reveal-fallback — страховка, если и он почему-то промолчал. */
-html.js [data-reveal] {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+/* Появление блоков при прокрутке — чистый CSS, без участия JavaScript.
+   Safari замораживает неактивную вкладку целиком (React, таймеры, observers),
+   поэтому всё, что пряталось до сигнала от JS, оставалось невидимым: страница
+   белая, пока не подвигаешь мышью. Здесь замораживать нечего.
+
+   animation-timeline: view() привязывает анимацию к прокрутке. Браузер без
+   поддержки просто игнорирует это свойство — тогда анимация играет один раз
+   при загрузке. В обоих случаях конечное состояние (both) — блок ВИДЕН. */
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-html.js [data-reveal][data-shown],
-html.reveal-fallback [data-reveal] {
-  opacity: 1;
-  transform: none;
+
+[data-reveal] {
+  animation: reveal-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.js [data-reveal] {
-    opacity: 1;
-    transform: none;
-    transition: none;
+  [data-reveal] {
+    animation: none;
   }
 }
 

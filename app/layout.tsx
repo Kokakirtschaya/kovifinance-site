@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Golos_Text, Inter } from "next/font/google";
 import "./globals.css";
 import ScrollProgress from "@/components/site/ScrollProgress";
-import HydrationFlag from "@/components/site/HydrationFlag";
 import CookieBanner from "@/components/site/CookieBanner";
 import YandexMetrica from "@/components/site/YandexMetrica";
 
@@ -56,21 +55,6 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${golos.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <noscript>
-          {/* Без JS whileInView не срабатывает — принудительно показываем reveal-контент */}
-          <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
-        </noscript>
-        {/* Страховка от белой страницы. Класс js ставится сразу — только под ним CSS
-            прячет reveal-блоки, иначе при мёртвых скриптах страница была бы пустой.
-            Через 1.5 с проверяем результат по факту: показан ли хоть один блок.
-            Проверять «ожил ли React» недостаточно — 7 августа он оживал (класс
-            hydrated стоял), а блоки всё равно висели невидимыми до движения мыши. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var d=document.documentElement;d.classList.add('js');setTimeout(function(){if(!document.querySelector('[data-reveal][data-shown]'))d.classList.add('reveal-fallback')},1500)})()`,
-          }}
-        />
-        <HydrationFlag />
         <ScrollProgress />
         {children}
         <CookieBanner />

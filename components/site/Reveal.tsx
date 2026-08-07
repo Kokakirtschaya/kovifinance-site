@@ -1,18 +1,18 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-
 /**
- * Появление блока при прокрутке.
+ * Появление блока при прокрутке — БЕЗ JavaScript.
  *
- * Раньше здесь был whileInView из motion — и на Safari блоки оставались невидимыми
- * до первого движения мыши: проверка видимости не срабатывала сама, страница висела
- * белой. Теперь наблюдаем сами: IntersectionObserver сообщает о состоянии сразу,
- * как только начинает следить, поэтому видимые блоки показываются в первом же кадре.
+ * История вопроса: сначала здесь был whileInView из motion, потом свой
+ * IntersectionObserver — и то и другое ломалось одинаково. Safari замораживает
+ * неактивную вкладку целиком: React, таймеры и наблюдатели встают. Контент,
+ * спрятанный до сигнала от JS, оставался невидимым — страница белая, пока не
+ * подвигаешь мышью.
  *
- * Сама анимация — на CSS (globals.css, правила для [data-reveal]). Сервер отдаёт
- * разметку без скрытия: контент прячется только когда JS точно жив (класс .js),
- * иначе страница осталась бы пустой при любом сбое скриптов.
+ * Теперь анимация живёт в CSS (globals.css, [data-reveal]) и управляется
+ * прокруткой через animation-timeline: view(). Замораживать нечего: если
+ * браузер не умеет scroll-driven анимации, правило игнорируется и блок просто
+ * проявляется при загрузке — видимый в любом случае.
+ *
+ * Серверный компонент: клиентского кода здесь больше нет.
  */
 export default function Reveal({
   children,
@@ -23,51 +23,11 @@ export default function Reveal({
   delay?: number;
   className?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [shown, setShown] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    // reduced-motion: показываем сразу, без движения
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setShown(true);
-      return;
-    }
-
-    // Сначала смотрим сами: если блок уже на экране, показываем немедленно.
-    // Не полагаемся на наблюдателя — на Safari он молчал до движения мыши,
-    // и страница оставалась белой, хотя React был жив.
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight * 0.88 && rect.bottom > 0) {
-      setShown(true);
-      return;
-    }
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            setShown(true);
-            io.disconnect();
-          }
-        }
-      },
-      { rootMargin: "-12% 0px" },
-    );
-
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
   return (
     <div
-      ref={ref}
       data-reveal
-      data-shown={shown ? "" : undefined}
       className={className}
-      style={delay ? { transitionDelay: `${delay}s` } : undefined}
+      style={delay ? { animationDelay: `${delay}s` } : undefined}
     >
       {children}
     </div>
