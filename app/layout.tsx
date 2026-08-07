@@ -4,6 +4,7 @@ import "./globals.css";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import CookieBanner from "@/components/site/CookieBanner";
 import YandexMetrica from "@/components/site/YandexMetrica";
+import ErrorGuard from "@/components/site/ErrorGuard";
 
 // Основной шрифт бренда — Golos Text; Inter — запасной (по бренд-гайду)
 const golos = Golos_Text({
@@ -55,6 +56,9 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${golos.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        {/* Сторож белого экрана: ставим первым, чтобы он успел подписаться на
+            ошибки до того, как отрисуется остальная страница. */}
+        <ErrorGuard />
         <ScrollProgress />
         {children}
         <CookieBanner />
