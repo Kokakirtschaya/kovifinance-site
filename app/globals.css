@@ -44,6 +44,36 @@ html {
    [data-reveal] сохранён как разметочный маркер: если решим вернуть анимацию,
    делать это только с состоянием «видно» по умолчанию. */
 
+/* Полоска прогресса прокрутки (components/site/ScrollProgress.tsx).
+
+   По умолчанию её НЕТ. Показываем только там, где браузер умеет привязать
+   анимацию к прокрутке средствами CSS — тогда обходимся без JavaScript.
+   Раньше полоску двигал motion (useScroll + useSpring), и его rAF-цикл
+   срывался после заморозки вкладки, утаскивая за собой отрисовку всей
+   страницы: экран белый при живом DOM. Пустой участок в 3 пикселя — цена,
+   несопоставимая с этим. */
+[data-scroll-progress] {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  [data-scroll-progress] {
+    display: block;
+    transform: scaleX(0);
+    animation: kovi-scroll-progress linear;
+    animation-timeline: scroll();
+  }
+}
+
+@keyframes kovi-scroll-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 /* Якоря (#services и т.п.) — сдвиг из-под липкой шапки (h-16 = 64px + воздух).
    Раньше это делал Lenis через offset: -80. От самого Lenis отказались:
    его rAF-цикл замирал в неактивной вкладке, страница оставалась с классом
