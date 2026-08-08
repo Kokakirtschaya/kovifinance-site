@@ -49,35 +49,49 @@
     <g id="bill1" class="bill">
       <rect x="210" y="240" width="80" height="42" rx="4" fill="#a1dbb2" stroke="#2f3640" stroke-width="3" />
       <circle cx="250" cy="261" r="11" fill="none" stroke="#2f3640" stroke-width="2" />
-      <text x="250" y="267" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="#2f3640">₽</text>
     </g>
 
     <g id="bill2" class="bill">
       <rect x="210" y="240" width="80" height="42" rx="4" fill="#ffb0b0" stroke="#2f3640" stroke-width="3" />
       <circle cx="250" cy="261" r="11" fill="none" stroke="#2f3640" stroke-width="2" />
-      <text x="250" y="267" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="#2f3640">₽</text>
     </g>
 
     <g id="bill3" class="bill">
       <rect x="210" y="240" width="80" height="42" rx="4" fill="#a1dbb2" stroke="#2f3640" stroke-width="3" />
       <circle cx="250" cy="261" r="11" fill="none" stroke="#2f3640" stroke-width="2" />
-      <text x="250" y="267" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="#2f3640">₽</text>
     </g>
 
     <g id="bill4" class="bill">
       <rect x="210" y="240" width="80" height="42" rx="4" fill="#ffb0b0" stroke="#2f3640" stroke-width="3" />
       <circle cx="250" cy="261" r="11" fill="none" stroke="#2f3640" stroke-width="2" />
-      <text x="250" y="267" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="16" fill="#2f3640">₽</text>
     </g>
 
     <!-- ===== Касса: верхний слой ===== -->
     <rect x="150" y="240" width="200" height="130" rx="8" fill="#ffffff" stroke="#2f3640" stroke-width="6" />
 
     <rect x="190" y="170" width="120" height="60" rx="6" fill="#2f3640" stroke="#2f3640" stroke-width="2" />
-    <text id="score1" class="score" x="250" y="209" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="26" fill="#2ecc71">5 000</text>
-    <text id="score2" class="score" x="250" y="209" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="26" fill="#2ecc71">10 000</text>
-    <text id="score3" class="score" x="250" y="209" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="26" fill="#2ecc71">15 000</text>
-    <text id="score4" class="score" x="250" y="209" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="26" fill="#2ecc71">20 000</text>
+    <g id="score1" class="score">
+      <rect x="206" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="226" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+    </g>
+    <g id="score2" class="score">
+      <rect x="206" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="226" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="246" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+    </g>
+    <g id="score3" class="score">
+      <rect x="206" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="226" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="246" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="266" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+    </g>
+    <g id="score4" class="score">
+      <rect x="206" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="226" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="246" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="266" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+      <rect x="286" y="196" width="14" height="26" rx="2" fill="#2ecc71" />
+    </g>
     <rect x="235" y="230" width="30" height="10" fill="#2f3640" />
 
     <path d="M 150,320 L 120,380 L 380,380 L 350,320 Z" fill="#f1f2f6" stroke="#2f3640" stroke-width="6" stroke-linejoin="round" />
