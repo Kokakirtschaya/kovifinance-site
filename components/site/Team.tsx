@@ -32,9 +32,9 @@ export default function Team() {
             браузер изолирует его в отдельный слой и backdrop-filter не работает —
             стекло секунду стоит прозрачным, а размывается только после анимации.
             Матовое стекло (backdrop-blur) убрано вместе с остальными фильтрами —
-            вместо него плотная подложка ink/45: читается так же, рисуется дёшево. */}
+            вместо него непрозрачная подложка ink: офис за карточкой не просвечивает. */}
         <div className="mt-12">
-          <div className="grid overflow-hidden rounded-3xl border border-white/15 bg-ink/45 shadow-[var(--shadow-lift)] md:grid-cols-[0.85fr_1.15fr]">
+          <div className="grid overflow-hidden rounded-3xl border border-white/15 bg-ink shadow-[var(--shadow-lift)] md:grid-cols-[0.85fr_1.15fr]">
             {/* Портрет основателя. Портретная пропорция колонки (4:5) под пропорции
                 самого фото — иначе object-cover «зумит» лицо в почти-квадрат. */}
             <div className="relative aspect-[4/5] bg-brand-dark">
