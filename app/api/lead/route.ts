@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createLead } from "@/lib/crm";
 import { lookupInn } from "@/lib/checko";
+import { notifyTelegram } from "@/lib/notify";
 
 type Lead = {
   name?: string;
@@ -71,34 +72,26 @@ export async function POST(request: Request) {
     source: source || undefined,
   });
 
-  // 2) В Telegram — быстрое уведомление менеджеру (дублирует, не заменяет CRM)
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (token && chatId) {
-    const text =
-      `🟢 Новая заявка с сайта${source ? ` (${source})` : ""}\n\n` +
-      `👤 ${name}\n📞 ${phone}\n` +
-      (email ? `✉️ ${email}\n` : "") +
-      (lead.inn
-        ? `🏢 ИНН: ${lead.inn}` +
-          (company ? ` — ${company}` : innNotInRegistry ? " — ⚠️ в реестре не найден" : "") +
-          "\n"
-        : "") +
-      `💼 ${title}` +
-      (amount ? `\n💰 ${amount}` : "") +
-      `\n\n${crm.ok ? "✅ в CRM" : "⚠️ CRM недоступна — занести вручную"}`;
-    try {
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text }),
-      });
-    } catch (err) {
-      console.error("telegram notify failed", err);
-    }
-  } else {
-    console.log("LEAD", JSON.stringify({ ...lead, crm: crm.ok }));
-  }
+  // 2) В Telegram — быстрое уведомление менеджеру (дублирует, не заменяет CRM).
+  // Идёт релеем через сервер CRM: напрямую из контейнера Telegram недостижим —
+  // подробности в lib/notify.ts.
+  const text =
+    `🟢 Новая заявка с сайта${source ? ` (${source})` : ""}\n\n` +
+    `👤 ${name}\n📞 ${phone}\n` +
+    (email ? `✉️ ${email}\n` : "") +
+    (lead.inn
+      ? `🏢 ИНН: ${lead.inn}` +
+        (company ? ` — ${company}` : innNotInRegistry ? " — ⚠️ в реестре не найден" : "") +
+        "\n"
+      : "") +
+    `💼 ${title}` +
+    (amount ? `\n💰 ${amount}` : "") +
+    `\n\n${crm.ok ? "✅ в CRM" : "⚠️ CRM недоступна — занести вручную"}`;
+
+  const notified = await notifyTelegram(text);
+
+  // Заявка целиком в логах — на случай, если не дошло ни то, ни другое
+  console.log("LEAD", JSON.stringify({ ...lead, crm: crm.ok, tg: notified.ok }));
 
   return NextResponse.json({ ok: true });
 }
