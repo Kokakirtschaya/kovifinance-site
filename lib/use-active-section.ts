@@ -15,32 +15,42 @@ export function useActiveSection(): string {
     if (!sections.length) return;
 
     const update = () => {
-      const doc = document.documentElement;
-      const bottom =
-        window.innerHeight + window.scrollY >= doc.scrollHeight - 80;
-      // Форма заявки и короткий футер почти никогда не пересекают «линию»
-      // в трети экрана — иначе «Контакты» не загораются до самого низа.
-      if (bottom) {
+      const lead = document.getElementById("lead");
+      const contacts = document.getElementById("contacts");
+      const vh = window.innerHeight;
+
+      const visible = (el: HTMLElement | null) => {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return r.top < vh - 40 && r.bottom > 80;
+      };
+
+      const nearBottom =
+        vh + window.scrollY >= document.documentElement.scrollHeight - Math.max(200, vh * 0.25);
+
+      // Форма заявки и футер — это «Контакты». Короткий подвал сам по себе
+      // никогда не доезжает до старой линии в 1/3 экрана.
+      if (nearBottom || visible(contacts) || (lead && lead.getBoundingClientRect().top < vh * 0.55)) {
         setActive("#contacts");
         return;
       }
-      if (window.scrollY < window.innerHeight * 0.45) {
+
+      if (window.scrollY < vh * 0.35) {
         setActive("");
         return;
       }
-      const line = window.innerHeight / 3;
+
+      const line = vh / 3;
       let hash = "";
       for (const el of sections) {
+        if (el.id === "contacts") continue;
         if (el.getBoundingClientRect().top <= line) hash = `#${el.id}`;
       }
-      const lead = document.getElementById("lead");
-      if (lead && lead.getBoundingClientRect().top <= line) hash = "#contacts";
       setActive(hash);
     };
 
-    // Если открыли по якорю — не сбрасываем его, пока браузер не докрутит.
-    if (window.location.hash) setActive(window.location.hash);
-    else update();
+    update();
+    requestAnimationFrame(update);
 
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
