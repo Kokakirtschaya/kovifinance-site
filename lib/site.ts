@@ -18,6 +18,7 @@ export const NAV = [
   { label: "Калькулятор", href: "#calc" },
   { label: "Клиентам", href: "#process" },
   { label: "Агентам", href: "#agents" },
+  { label: "CRM", href: "#crm" },
   { label: "О компании", href: "#team" },
   { label: "Вопросы", href: "#faq" },
   { label: "Контакты", href: "#contacts" },

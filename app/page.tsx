@@ -5,6 +5,7 @@ import Services from "@/components/site/Services";
 import Calculator from "@/components/site/Calculator";
 import Process from "@/components/site/Process";
 import Agents from "@/components/site/Agents";
+import CrmTeaser from "@/components/site/CrmTeaser";
 import Team from "@/components/site/Team";
 import BrandLegend from "@/components/site/BrandLegend";
 import FAQ from "@/components/site/FAQ";
@@ -44,6 +45,7 @@ export default function Home() {
         <Calculator />
         <Process />
         <Agents />
+        <CrmTeaser />
         <Team />
         <BrandLegend />
         <FAQ />

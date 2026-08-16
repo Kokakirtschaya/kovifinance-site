@@ -28,11 +28,9 @@ export default function Header() {
           <img src="/brand/logo-primary.svg" alt="KOVI Finance" className="h-8 w-auto" />
         </a>
 
-        {/* Полное меню только с lg. На 768–1024 логотип + 7 пунктов + телефон + кнопка
-            требуют ~1040px при доступных 984 — и всё это переносилось на вторую строку.
-            Шаг между пунктами всегда 16px: контейнер шире 1152px не становится, поэтому
-            запаса на широкий шаг (было xl:gap-7, +72px) в бюджете шапки просто нет. */}
-        <nav className="hidden items-center gap-4 lg:flex">
+        {/* Полное меню только с lg. Пункт CRM короткий; шаг 12px, чтобы восемь
+            якорей не выталкивали правый блок на вторую строку. */}
+        <nav className="hidden items-center gap-3 lg:flex">
           {NAV.map((n) => (
             <a
               key={n.href}
