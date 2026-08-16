@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { SHELL } from "@/lib/layout";
 import Reveal from "@/components/site/Reveal";
 
 const FEATURES = [
@@ -23,7 +24,7 @@ const FEATURES = [
 export default function CrmTeaser() {
   return (
     <section id="crm" className="bg-paper">
-      <div className="mx-auto max-w-6xl px-5 py-20 md:py-28">
+      <div className={`${SHELL} py-20 md:py-28`}>
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
           <Reveal>
             <div className="flex flex-wrap items-center gap-2">

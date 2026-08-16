@@ -1,10 +1,11 @@
 import { NAV, CONTACTS } from "@/lib/site";
+import { SHELL } from "@/lib/layout";
 import Socials from "@/components/site/Socials";
 
 export default function Footer() {
   return (
     <footer id="contacts" className="bg-ink text-paper">
-      <div className="mx-auto max-w-6xl px-5 pt-16 pb-28 md:pb-16">
+      <div className={`${SHELL} pt-16 pb-28 md:pb-16`}>
         <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}

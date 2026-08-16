@@ -1,30 +1,45 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 /**
- * Полоска прогресса прокрутки вверху страницы — БЕЗ JavaScript.
+ * Зелёная полоска сверху — куда докрутили страницу.
  *
- * ⚠️ Здесь был motion: useScroll + useSpring. Он и оказался причиной белого
- * экрана после ночи с открытой вкладкой (08.08.2026). Механизм тот же, из-за
- * которого раньше выкорчевали Lenis и whileInView: пружина крутится на
- * requestAnimationFrame, Safari замораживает фоновую вкладку целиком, цикл
- * встаёт — а при разморозке получает многочасовой шаг времени и срывается,
- * бесконечно перерисовывая свой слой (WebContent ловили на 50% CPU). Слой
- * этот лежит поверх всего документа (fixed, z-60), поэтому переставала
- * отрисовываться вся страница: DOM целый, высота body 8579px, консоль чистая,
- * а экран белый — и обновление не спасало.
- *
- * Третий случай подряд на одном и том же — правило по итогу простое:
- * НИКАКИХ постоянно живущих rAF-циклов на этом сайте.
- *
- * Теперь анимация привязана к прокрутке средствами CSS (animation-timeline:
- * scroll(), см. globals.css). Там, где браузер этого не умеет, полоски просто
- * нет: @supports прячет элемент целиком. Декоративная деталь не имеет права
- * решать, увидит ли человек страницу.
+ * CSS scroll-timeline, где браузер умеет. Иначе — один обработчик scroll
+ * (не пружина и не вечный rAF: из-за них Safari белил вкладку).
  */
 export default function ScrollProgress() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const cssOk =
+      typeof CSS !== "undefined" &&
+      typeof CSS.supports === "function" &&
+      CSS.supports("animation-timeline", "scroll()");
+    if (cssOk) return;
+
+    const update = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      el.style.transform = `scaleX(${p})`;
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   return (
     <div
+      ref={ref}
       aria-hidden
       data-scroll-progress
-      className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-brand"
+      className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-brand"
     />
   );
 }

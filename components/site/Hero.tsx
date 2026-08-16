@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { CONTACTS } from "@/lib/site";
+import { SHELL } from "@/lib/layout";
 import MagneticButton from "@/components/site/MagneticButton";
 
 export default function Hero() {
@@ -18,7 +19,7 @@ export default function Hero() {
             "radial-gradient(60% 45% at 100% 0%, rgba(30,122,87,0.30) 0%, transparent 70%), radial-gradient(55% 45% at 0% 100%, rgba(212,160,23,0.12) 0%, transparent 70%)",
         }}
       />
-      <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-12 md:pt-20">
+      <div className={`relative ${SHELL} pb-16 pt-12 md:pt-20`}>
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
           {/* Текст */}
           <div>

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import Reveal from "@/components/site/Reveal";
+import { SHELL } from "@/lib/layout";
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(Math.round(n || 0));
@@ -143,7 +144,7 @@ export default function Calculator() {
 
   return (
     <section id="calc" className="bg-ink py-20 text-paper md:py-28">
-      <div className="mx-auto max-w-6xl px-5">
+      <div className={SHELL}>
         <Reveal className="max-w-2xl">
           <h2 className="text-3xl font-bold tracking-[-0.02em] text-white md:text-5xl">
             Рассчитайте условия <span className="text-gold-bright">за минуту</span>

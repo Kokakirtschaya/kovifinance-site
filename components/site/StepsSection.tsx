@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Step } from "@/lib/site";
+import { SHELL } from "@/lib/layout";
 import Reveal from "@/components/site/Reveal";
 import AdvantageIcon, { type AdvantageIconName } from "@/components/site/AdvantageIcon";
 import CardChevrons from "@/components/site/CardChevrons";
@@ -33,7 +34,7 @@ export default function StepsSection({
 }) {
   return (
     <section id={id} className={className}>
-      <div className="mx-auto max-w-6xl px-5 py-20 md:py-28">
+      <div className={`${SHELL} py-20 md:py-28`}>
         <div className="grid gap-14 lg:grid-cols-2">
           <Reveal>
             <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">{title}</h2>

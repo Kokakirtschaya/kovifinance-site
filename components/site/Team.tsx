@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { SHELL } from "@/lib/layout";
 import Reveal from "@/components/site/Reveal";
 
 // Честный блок: один эксперт-основатель, без выдуманных сотрудников.
@@ -17,7 +18,7 @@ export default function Team() {
       <Image src="/team/office.jpg" alt="" aria-hidden fill sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-b from-ink/90 via-ink/70 to-ink/40" />
 
-      <div className="relative mx-auto max-w-6xl px-5">
+      <div className={`relative ${SHELL}`}>
         <Reveal className="max-w-2xl">
           <h2 className="text-3xl font-bold tracking-[-0.02em] text-white md:text-5xl">
             Вы работаете напрямую <span className="text-gold-bright">с основателем</span>

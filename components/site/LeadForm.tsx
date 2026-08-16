@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { SERVICES, CONTACTS } from "@/lib/site";
+import { SHELL } from "@/lib/layout";
 import { isValidInn, normalizeInn } from "@/lib/inn";
 import Reveal from "@/components/site/Reveal";
 
@@ -31,7 +32,7 @@ export default function LeadForm() {
   }
 
   return (
-    <section id="lead" className="mx-auto max-w-6xl px-5 py-20 md:py-28">
+    <section id="lead" className={`${SHELL} py-20 md:py-28`}>
       <Reveal>
       <div className="grid overflow-hidden rounded-3xl border border-black/[0.07] bg-white shadow-[var(--shadow-lift)] lg:grid-cols-[1fr_1.1fr]">
         <div className="relative bg-ink p-8 text-paper md:p-12">
