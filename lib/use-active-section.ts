@@ -15,6 +15,15 @@ export function useActiveSection(): string {
     if (!sections.length) return;
 
     const update = () => {
+      const doc = document.documentElement;
+      const bottom =
+        window.innerHeight + window.scrollY >= doc.scrollHeight - 80;
+      // Форма заявки и короткий футер почти никогда не пересекают «линию»
+      // в трети экрана — иначе «Контакты» не загораются до самого низа.
+      if (bottom) {
+        setActive("#contacts");
+        return;
+      }
       if (window.scrollY < window.innerHeight * 0.45) {
         setActive("");
         return;
@@ -24,6 +33,8 @@ export function useActiveSection(): string {
       for (const el of sections) {
         if (el.getBoundingClientRect().top <= line) hash = `#${el.id}`;
       }
+      const lead = document.getElementById("lead");
+      if (lead && lead.getBoundingClientRect().top <= line) hash = "#contacts";
       setActive(hash);
     };
 
