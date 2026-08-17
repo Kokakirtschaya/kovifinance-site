@@ -58,7 +58,7 @@ Timeweb (из-за требования ЕСИА к идентификации �
 - [ ] `AUTH_URL` — `https://kovifinance.ru`.
 - [ ] `SMTP_HOST/PORT/USER/PASSWORD`, `EMAIL_FROM` — **боевой** SMTP (почта на домене
       kovifinance.ru), а не тестовый Ethereal. Нужен для магик-линка в ЛК.
-- [ ] `CRM_API_URL`, `CRM_API_TOKEN` — прод-адрес CRM.
+- [ ] `CRM_API_URL` = `https://crm.kovifinance.ru`, `CRM_API_TOKEN` = `PUBLIC_API_TOKEN` в CRM.
 - [ ] `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` — чтобы заявки уходили в Telegram.
 - [ ] `CHECKO_API_KEY`, `CHECKO_BASE_URL` — проверка ИНН в форме.
 

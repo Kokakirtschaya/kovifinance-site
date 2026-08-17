@@ -451,7 +451,7 @@ docker run --rm postgres:16-alpine psql "postgresql://kovi_app:ПАРОЛЬ@HOST
 > | `DATABASE_URL` | ✅ `postgresql://gen_user:***@192.168.0.4:5432/default_db?sslmode=require` |
 > | `AUTH_SECRET` | ✅ задан |
 > | `AUTH_URL` | ✅ `https://kokakirtschaya-kovifinance-site-3dd9.twc1.net` — **и это верно сейчас** |
-> | `CRM_API_URL` | ✅ `https://crm.koka-net.ru` |
+> | `CRM_API_URL` | ✅ `https://crm.kovifinance.ru` |
 > | `CRM_API_TOKEN` | ✅ задан |
 > | `CHECKO_BASE_URL` | ✅ `https://api.checko.ru/v2` |
 > | `CHECKO_API_KEY` | ✅ задан |
@@ -474,7 +474,7 @@ docker run --rm postgres:16-alpine psql "postgresql://kovi_app:ПАРОЛЬ@HOST
 | `DATABASE_URL` | строка Postgres из этапа 2 |
 | `AUTH_SECRET` | **новый** секрет: сгенерировать `openssl rand -base64 32` (НЕ из локалки) |
 | `AUTH_URL` | временный домен `*.twc1.net`, а на этапе 7 → `https://kovifinance.ru` |
-| `CRM_API_URL` | `https://crm.koka-net.ru` |
+| `CRM_API_URL` | `https://crm.kovifinance.ru` |
 | `CRM_API_TOKEN` | = `PUBLIC_API_TOKEN` в CRM |
 | `TELEGRAM_BOT_TOKEN` | токен бота (чтобы заявки уходили в TG) |
 | `TELEGRAM_CHAT_ID` | id чата для заявок |

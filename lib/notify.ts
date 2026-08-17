@@ -9,6 +9,8 @@
 // Порядок именно такой (сначала релей): пробовать заблокированный путь первым —
 // это лишние секунды ожидания на каждой заявке.
 
+import { crmApiBase } from "@/lib/crm";
+
 const RELAY_TIMEOUT_MS = 9000;
 const DIRECT_TIMEOUT_MS = 5000;
 
@@ -17,7 +19,7 @@ export type NotifyResult =
   | { ok: false; reason: string };
 
 async function viaRelay(text: string): Promise<NotifyResult> {
-  const base = process.env.CRM_API_URL;
+  const base = crmApiBase();
   const token = process.env.CRM_API_TOKEN;
   if (!base || !token) return { ok: false, reason: "relay_unconfigured" };
 

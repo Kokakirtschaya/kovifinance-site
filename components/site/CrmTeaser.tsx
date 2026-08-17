@@ -15,10 +15,6 @@ const FEATURES = [
     title: "Досье клиента",
     desc: "Устав, отчётность, договоры и анкеты банков лежат на карточке, а не в чатах.",
   },
-  {
-    title: "Кабинет и доступы",
-    desc: "Клиент видит статус заявки. Команда работает в своих границах: резервы, файлы, лимиты.",
-  },
 ];
 
 export default function CrmTeaser() {
@@ -60,7 +56,7 @@ export default function CrmTeaser() {
           </Reveal>
         </div>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
             <Reveal key={f.title} delay={i * 0.05} className="h-full">
               <div className="flex h-full flex-col rounded-2xl border border-black/[0.07] bg-white p-6 shadow-[var(--shadow-soft)]">
