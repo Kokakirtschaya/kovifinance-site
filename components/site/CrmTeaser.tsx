@@ -80,26 +80,18 @@ export default function CrmTeaser() {
             </div>
           </Reveal>
           <Reveal delay={0.06}>
-            <div className="flex h-full flex-col justify-between rounded-3xl bg-brand-dark p-8 text-white shadow-[var(--shadow-soft)] md:p-10">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-widest text-gold-bright">
-                  IV квартал 2026
-                </p>
-                <h3 className="mt-3 text-2xl font-bold tracking-tight">
-                  Сначала доводим до тишины. Потом открываем.
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-white/70">
-                  Почта, календарь, досье и расчёт резерва по 590-П уже в работе у команды.
-                  Публичный доступ появится, когда система будет вести сделку так же
-                  спокойно, как мы ведём её руками.
-                </p>
-              </div>
-              <a
-                href="#lead"
-                className="press mt-8 inline-flex self-start rounded-full bg-brand px-6 py-3 font-semibold text-white transition-colors hover:bg-white hover:text-brand-dark"
-              >
-                Написать нам
-              </a>
+            <div className="flex h-full flex-col rounded-3xl bg-brand-dark p-8 text-white shadow-[var(--shadow-soft)] md:p-10">
+              <p className="text-sm font-semibold uppercase tracking-widest text-gold-bright">
+                IV квартал 2026
+              </p>
+              <h3 className="mt-3 text-2xl font-bold tracking-tight">
+                Сначала доводим до тишины. Потом открываем.
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-white/70">
+                Почта, календарь, досье и расчёт резерва по 590-П уже в работе у команды.
+                Публичный доступ появится, когда система будет вести сделку так же
+                спокойно, как мы ведём её руками.
+              </p>
             </div>
           </Reveal>
         </div>
