@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createLead } from "@/lib/crm";
 import { lookupInn } from "@/lib/checko";
 import { notifyTelegram } from "@/lib/notify";
+import { clientIpFromHeaders, FIFTEEN_MIN, rateLimit } from "@/lib/rate-limit";
 
 type Lead = {
   name?: string;
@@ -19,6 +20,11 @@ type Lead = {
 };
 
 export async function POST(request: Request) {
+  const ip = clientIpFromHeaders(request.headers);
+  if (!rateLimit(`lead:ip:${ip}`, 8, FIFTEEN_MIN)) {
+    return NextResponse.json({ ok: false, error: "rate" }, { status: 429 });
+  }
+
   let body: Lead;
   try {
     body = await request.json();
@@ -90,8 +96,18 @@ export async function POST(request: Request) {
 
   const notified = await notifyTelegram(text);
 
-  // Заявка целиком в логах — на случай, если не дошло ни то, ни другое
-  console.log("LEAD", JSON.stringify({ ...lead, crm: crm.ok, tg: notified.ok }));
+  // В лог — без телефона и почты. Если не дошло ни в CRM, ни в TG — заявка
+  // всё равно у менеджера в форме/звонке, а логи Timeweb не копия анкеты.
+  console.log(
+    "LEAD",
+    JSON.stringify({
+      inn: lead.inn ? `***${lead.inn.slice(-4)}` : "",
+      title,
+      source,
+      crm: crm.ok,
+      tg: notified.ok,
+    }),
+  );
 
   return NextResponse.json({ ok: true });
 }

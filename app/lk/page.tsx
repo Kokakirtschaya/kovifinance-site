@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { auth, signIn, signOut } from "@/auth";
+import { auth, signOut } from "@/auth";
 import LoginForm from "@/app/lk/login-form";
+import { requestMagicLink } from "@/app/lk/actions";
 import { getApplications, type Application } from "@/lib/crm";
 import { CONTACTS } from "@/lib/site";
 
@@ -80,12 +81,7 @@ export default async function CabinetPage({
                     Введите e-mail, с которого оставляли заявку. Пришлём ссылку для входа —
                     пароль не нужен.
                   </p>
-                  <LoginForm
-                    action={async (email: string) => {
-                      "use server";
-                      await signIn("email", { email, redirectTo: "/lk" });
-                    }}
-                  />
+                  <LoginForm action={requestMagicLink} />
                   <p className="mt-4 text-xs text-muted">
                     Ещё не оставляли заявку?{" "}
                     <Link href="/#lead" className="text-brand underline underline-offset-2">

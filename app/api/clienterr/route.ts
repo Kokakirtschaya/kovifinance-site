@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { clientIpFromHeaders, MINUTE, rateLimit } from "@/lib/rate-limit";
 
 /**
  * Приёмник клиентских ошибок: то, что упало в браузере, попадает в
@@ -17,6 +18,11 @@ const cut = (value: unknown, max: number) =>
   typeof value === "string" ? value.slice(0, max) : undefined;
 
 export async function POST(request: Request) {
+  const ip = clientIpFromHeaders(request.headers);
+  if (!rateLimit(`clienterr:ip:${ip}`, 30, MINUTE)) {
+    return NextResponse.json({ ok: true });
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();

@@ -2,7 +2,18 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
 
+const SECURITY_HEADERS = [
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  ...(!isDev
+    ? [{ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" }]
+    : []),
+];
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   // Компактный self-contained сервер для контейнера (Timeweb Apps / Docker):
   // .next/standalone содержит только нужные node_modules и server.js.
   output: "standalone",
@@ -24,15 +35,14 @@ const nextConfig: NextConfig = {
   images: isDev ? { minimumCacheTTL: 0 } : undefined,
 
   async headers() {
-    // Только в разработке: картинки и SVG правятся часто, а пути у них не меняются,
-    // поэтому браузер отдаёт старое из кэша и приходится жать Cmd+Option+R.
-    // На проде не применяется: там файлы должны кэшироваться.
-    if (!isDev) return [];
+    const security = [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    if (!isDev) return security;
     return [
       {
         source: "/:dir(decor|team|mood)/:path*",
         headers: [{ key: "Cache-Control", value: "no-store, must-revalidate" }],
       },
+      ...security,
     ];
   },
 };
