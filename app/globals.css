@@ -82,6 +82,8 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+
+
 /* Типографика: балансируем заголовки, убираем «сирот» в абзацах */
 h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }

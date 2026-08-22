@@ -40,25 +40,40 @@ export default function StepsSection({
             <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">{title}</h2>
             <p className="mt-4 text-lg text-muted">{subtitle}</p>
 
-            <ol className="mt-10 space-y-6">
-              {steps.map((s) => (
-                <li key={s.n} className="flex gap-5">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-soft text-sm font-bold text-brand-dark">
-                    {s.n}
-                  </span>
-                  <div>
-                    <h3 className="font-semibold tracking-tight">{s.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-muted">{s.desc}</p>
-                  </div>
-                </li>
-              ))}
+            <ol className="mt-10">
+              {steps.map((s, i) => {
+                const last = i === steps.length - 1;
+                return (
+                  <li key={s.n} className="relative flex gap-4 pb-8 last:pb-0 sm:gap-5">
+                    {!last && (
+                      <span
+                        aria-hidden
+                        className="absolute left-[21px] top-12 bottom-0 w-0.5 rounded-full bg-gradient-to-b from-brand/50 to-gold/40"
+                      />
+                    )}
+                    <span
+                      className={`relative z-[1] grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-sm font-bold tabular-nums shadow-[0_6px_16px_rgba(30,122,87,0.16)] ${
+                        last
+                          ? "bg-brand text-white"
+                          : "bg-brand-soft text-brand-dark ring-1 ring-brand/20"
+                      }`}
+                    >
+                      {s.n}
+                    </span>
+                    <div className="min-w-0 pt-1.5">
+                      <h3 className="font-semibold tracking-tight">{s.title}</h3>
+                      <p className="mt-1 text-sm leading-relaxed text-muted">{s.desc}</p>
+                    </div>
+                  </li>
+                );
+              })}
             </ol>
           </Reveal>
 
           <div className="grid gap-5 sm:grid-cols-2">
             {advantages.map((a, i) => (
               <Reveal key={a.title} delay={i * 0.06} className="h-full">
-                <div className="group relative h-full overflow-hidden rounded-2xl bg-brand-dark p-6 shadow-[var(--shadow-soft)] transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]">
+                <div className="group relative h-full min-h-[280px] overflow-hidden rounded-2xl bg-brand-dark p-6 shadow-[var(--shadow-soft)] transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]">
                   {a.decor ? (
                     /* Анимация живёт внутри SVG, поэтому грузим картинкой — так её CSS не утечёт
                        на страницу. next/image не подходит: SVG он не оптимизирует без

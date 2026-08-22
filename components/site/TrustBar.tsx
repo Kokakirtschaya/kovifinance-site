@@ -8,7 +8,7 @@ export default function TrustBar() {
       <div className="mx-auto max-w-3xl px-5 text-center">
         <p className="text-lg font-semibold text-ink">Финансовые советники для бизнеса</p>
         <p className="mt-2 text-base leading-relaxed text-muted">
-          Разбираем задачу, подбираем инструмент и структурируем сделку — от заявки до денег.
+          Разбираем задачу, подбираем инструмент и структурируем сделку: от заявки до денег.
           Советуем <span className="text-brand">исходя из вашей выгоды, а не банковской</span>.
         </p>
       </div>

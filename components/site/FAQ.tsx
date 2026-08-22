@@ -2,34 +2,35 @@
 
 import { useState } from "react";
 import { FAQ as ITEMS, CONTACTS } from "@/lib/site";
-import Reveal from "@/components/site/Reveal";
+import { SHELL } from "@/lib/layout";
 
 export default function FAQ() {
-  // null — свёрнуты все: список читается целиком, посетитель сам раскрывает нужное
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="mx-auto max-w-3xl px-5 py-20 md:py-28">
-      <Reveal className="text-center">
-        <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">
-          Частые <span className="text-brand">вопросы</span>
-        </h2>
-      </Reveal>
+    <section id="faq" className={`${SHELL} py-20 md:py-28`}>
+      <h2 className="max-w-[12ch] text-3xl font-bold tracking-[-0.03em] md:text-5xl">
+        Частые вопросы
+      </h2>
 
-      <Reveal className="mt-10 divide-y divide-black/[0.08] rounded-2xl border border-black/[0.07] bg-white px-5 shadow-[var(--shadow-soft)] md:px-7">
+      <div className="mt-10 border-t border-black/[0.08]">
         {ITEMS.map((item, i) => {
           const isOpen = open === i;
           return (
-            <div key={i}>
+            <div key={item.q} className="border-b border-black/[0.08]">
               <button
                 onClick={() => setOpen(isOpen ? null : i)}
-                className="flex w-full items-center justify-between gap-4 py-5 text-left"
+                className="flex w-full items-start justify-between gap-6 py-5 text-left md:py-6"
                 aria-expanded={isOpen}
               >
-                <span className="font-semibold tracking-tight">{item.q}</span>
+                <span className="text-base font-semibold tracking-tight md:text-lg">
+                  {item.q}
+                </span>
                 <span
-                  className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border border-black/10 text-lg transition-transform ${
-                    isOpen ? "rotate-45 border-brand text-brand" : "text-muted"
+                  className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border text-lg leading-none transition-transform ${
+                    isOpen
+                      ? "rotate-45 border-brand text-brand"
+                      : "border-black/15 text-muted"
                   }`}
                 >
                   +
@@ -37,19 +38,19 @@ export default function FAQ() {
               </button>
               <div
                 className={`grid transition-[grid-template-rows] duration-300 ease-out ${
-                  isOpen ? "grid-rows-[1fr] pb-5" : "grid-rows-[0fr]"
+                  isOpen ? "grid-rows-[1fr] pb-6" : "grid-rows-[0fr]"
                 }`}
               >
-                <div className="overflow-hidden text-[15px] leading-relaxed text-muted">
+                <div className="overflow-hidden text-[15px] leading-relaxed text-muted md:max-w-[65ch]">
                   {item.a}
                 </div>
               </div>
             </div>
           );
         })}
-      </Reveal>
+      </div>
 
-      <p className="mt-8 text-center text-sm text-muted">
+      <p className="mt-8 text-sm text-muted">
         Не нашли ответ?{" "}
         <a href={CONTACTS.phoneHref} className="font-semibold text-brand hover:text-brand-dark">
           Позвоните нам
@@ -57,8 +58,8 @@ export default function FAQ() {
         или{" "}
         <a href="#lead" className="font-semibold text-brand hover:text-brand-dark">
           оставьте заявку
-        </a>{" "}
-        — ответим.
+        </a>
+        .
       </p>
     </section>
   );

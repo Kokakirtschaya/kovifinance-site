@@ -11,7 +11,11 @@ const nextConfig: NextConfig = {
   // с телефона Next блокирует JS-чанки, страница не гидрируется и все блоки
   // с Reveal остаются на серверном opacity: 0, то есть пустыми.
   // На продакшен не влияет: настройка только для режима разработки.
-  allowedDevOrigins: ["192.168.8.139"],
+  allowedDevOrigins: [
+    "192.168.8.139",
+    "192.168.11.106",
+    "100.113.36.85",
+  ],
 
   // В разработке не кэшируем оптимизированные картинки: путь у файла не меняется, и
   // оптимизатор продолжает отдавать старую версию (X-Nextjs-Cache: HIT) даже после
@@ -26,7 +30,7 @@ const nextConfig: NextConfig = {
     if (!isDev) return [];
     return [
       {
-        source: "/:dir(decor|team)/:path*",
+        source: "/:dir(decor|team|mood)/:path*",
         headers: [{ key: "Cache-Control", value: "no-store, must-revalidate" }],
       },
     ];

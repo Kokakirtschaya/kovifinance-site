@@ -206,7 +206,7 @@ function PhoneField() {
       />
       {showError && (
         <p className="mt-1.5 text-xs text-red-600">
-          Введите номер телефона полностью — 10 цифр после +7.
+          Введите номер телефона полностью: 10 цифр после +7.
         </p>
       )}
     </div>
@@ -334,7 +334,7 @@ function InnField() {
       {showError ? (
         <p className="mt-1.5 text-xs text-red-600">
           {orgNotFound
-            ? "Организация с таким ИНН не найдена — проверьте номер."
+            ? "Организация с таким ИНН не найдена, проверьте номер."
             : "Проверьте ИНН: 10 цифр для компании или 12 для ИП / физлица."}
         </p>
       ) : check.state === "loading" ? (
@@ -343,7 +343,7 @@ function InnField() {
         <p className="mt-1.5 text-xs text-brand">✓ {check.name || "Найдено в реестре"}</p>
       ) : check.state === "not_found" && kind === "ip" ? (
         <p className="mt-1.5 text-xs text-muted">
-          В реестре ИП не найдено — оформим как физлицо.
+          В реестре ИП не найдено, оформим как физлицо.
         </p>
       ) : null}
     </div>

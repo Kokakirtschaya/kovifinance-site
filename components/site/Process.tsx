@@ -4,7 +4,7 @@ import StepsSection, { type Advantage } from "@/components/site/StepsSection";
 const ADVANTAGES: Advantage[] = [
   {
     title: "Оплата за результат",
-    desc: "Комиссия — только после того, как вы получили деньги.",
+    desc: "Комиссия только после того, как вы получили деньги.",
     icon: "result",
     decor: { src: "/decor/cash-register.svg", box: "w-[60%] max-h-[78%]" },
   },

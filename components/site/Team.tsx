@@ -6,7 +6,7 @@ import Reveal from "@/components/site/Reveal";
 // Реальные регалии работают сами — прямой контакт с экспертом это преимущество,
 // а не слабость.
 const POINTS = [
-  "Знает требования банков изнутри — получает одобрения там, где отказывают другим",
+  "Знает требования банков изнутри: получает одобрения там, где отказывают другим",
   "Вы работаете напрямую с экспертом, а не с колл-центром или младшим менеджером",
   "Лично ведёт сделку от первой заявки до получения денег",
 ];
@@ -24,7 +24,7 @@ export default function Team() {
             Вы работаете напрямую <span className="text-gold-bright">с основателем</span>
           </h2>
           <p className="mt-4 text-lg text-white/70">
-            Никаких младших менеджеров и колл-центров — вашу сделку от первой заявки
+            Никаких младших менеджеров и колл-центров: сделку от первой заявки
             до получения денег ведёт основатель компании.
           </p>
         </Reveal>
@@ -34,40 +34,38 @@ export default function Team() {
             стекло секунду стоит прозрачным, а размывается только после анимации.
             Матовое стекло (backdrop-blur) убрано вместе с остальными фильтрами —
             вместо него непрозрачная подложка ink: офис за карточкой не просвечивает. */}
-        <div className="mt-12">
-          <div className="grid overflow-hidden rounded-3xl border border-white/15 bg-ink shadow-[var(--shadow-lift)] md:grid-cols-[0.85fr_1.15fr]">
-            {/* Портрет основателя. Портретная пропорция колонки (4:5) под пропорции
-                самого фото — иначе object-cover «зумит» лицо в почти-квадрат. */}
-            <div className="relative aspect-[4/5] bg-brand-dark">
-              <Image
-                src="/brand/founder.jpg"
-                alt="Кирцхая Кока — основатель KOVI Finance"
-                fill
-                sizes="(min-width: 768px) 40vw, 100vw"
-                className="object-cover object-center"
-              />
-            </div>
+        <div className="mt-10 overflow-hidden rounded-3xl border border-white/15 bg-ink shadow-[var(--shadow-lift)] md:flex">
+          {/* Портрет всегда 3:4 и фиксированной ширины: не растягивается
+              в ленту на ультраwide и не зумится в ухо на узком окне. */}
+          <div className="relative mx-auto mt-6 aspect-[3/4] w-44 shrink-0 overflow-hidden rounded-2xl bg-brand-dark sm:w-52 md:mx-0 md:mt-0 md:w-[20rem] md:rounded-none lg:w-[22rem]">
+            <Image
+              src="/brand/founder.jpg"
+              alt="Кирцхая Кока, основатель KOVI Finance"
+              fill
+              sizes="(min-width: 768px) 22rem, 13rem"
+              className="object-cover object-[50%_12%]"
+            />
+          </div>
 
-            <div className="flex flex-col justify-center p-8 md:p-10">
-              <h3 className="text-2xl font-bold text-white">Кирцхая Кока</h3>
-              <p className="mt-1 font-medium text-gold-bright">
-                Основатель KOVI Finance · 15+ лет в банковском секторе
-              </p>
-              <ul className="mt-6 space-y-3 text-white/80">
-                {POINTS.map((p) => (
-                  <li key={p} className="flex gap-3">
-                    <span className="mt-0.5 shrink-0 text-gold-bright">✓</span>
-                    <span>{p}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="#lead"
-                className="press mt-8 inline-block self-start rounded-full bg-brand px-6 py-3 font-semibold text-white transition-colors hover:bg-brand-dark"
-              >
-                Обсудить задачу лично
-              </a>
-            </div>
+          <div className="flex flex-1 flex-col justify-center px-6 pb-8 pt-5 sm:px-8 md:p-10">
+            <h3 className="text-2xl font-bold text-white">Кирцхая Кока</h3>
+            <p className="mt-1 font-medium text-gold-bright">
+              Основатель KOVI Finance · 15+ лет в банковском секторе
+            </p>
+            <ul className="mt-6 space-y-3 text-white/80">
+              {POINTS.map((p) => (
+                <li key={p} className="flex gap-3">
+                  <span className="mt-0.5 shrink-0 text-gold-bright">✓</span>
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              href="#lead"
+              className="press mt-8 inline-block self-start rounded-full bg-brand px-6 py-3 font-semibold text-white transition-colors hover:bg-brand-dark"
+            >
+              Обсудить задачу лично
+            </a>
           </div>
         </div>
       </div>

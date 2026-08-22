@@ -1,80 +1,90 @@
+import Image from "next/image";
 import { SERVICES } from "@/lib/site";
 import { SHELL } from "@/lib/layout";
-import Reveal from "@/components/site/Reveal";
+
+const PHOTOS: Record<string, { src: string; alt: string }> = {
+  mortgage: {
+    src: "/mood/services/mortgage.jpg",
+    alt: "Стеклянный деловой центр в зелёно-золотом свете",
+  },
+  credit: {
+    src: "/mood/services/credit.jpg",
+    alt: "Досье сделки: договоры, папка и счётная машинка",
+  },
+  guarantee: {
+    src: "/mood/services/guarantee.jpg",
+    alt: "Папка с сургучной печатью и золотым перстнем",
+  },
+  factoring: {
+    src: "/mood/services/factoring.jpg",
+    alt: "Пачка отгрузочных документов на клипе",
+  },
+  leasing: {
+    src: "/mood/services/leasing.jpg",
+    alt: "Ключи и модель техники на папке сделки",
+  },
+  project: {
+    src: "/mood/services/project.jpg",
+    alt: "Архитектурный макет проекта рядом с чертежами",
+  },
+};
 
 export default function Services() {
   return (
     <section id="services" className={`${SHELL} py-20 md:py-28`}>
-      <Reveal className="max-w-2xl">
-        <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">
-          Подбираем инструмент <span className="text-brand">под вашу задачу</span>
-        </h2>
-        <p className="mt-4 text-lg text-muted">
-          Кредит, гарантия, факторинг, лизинг или проектное финансирование — от пополнения
-          оборотки до сделок на миллиарды.
-        </p>
-      </Reveal>
+      <h2 className="max-w-[20ch] font-bold tracking-[-0.03em] text-[clamp(1.85rem,3.2vw,3.75rem)]">
+        Подбираем инструмент <span className="text-brand">под задачу</span>
+      </h2>
+      <p className="mt-4 max-w-[52ch] text-lg leading-relaxed text-muted">
+        Кредит, гарантия, факторинг, лизинг или проектное финансирование: от
+        оборотки до сделок на миллиарды.
+      </p>
 
-      <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {SERVICES.map((s, i) => {
-          const badge =
-            s.slug === "credit"
-              ? {
-                  text: "Ключевой продукт",
-                  ring: "border-gold/40 ring-1 ring-gold/30",
-                  pill: "bg-gold/15 text-gold",
-                }
-              : s.slug === "mortgage"
-                ? {
-                    text: "Большой спрос",
-                    ring: "border-brand/40 ring-1 ring-brand/30",
-                    pill: "bg-brand-soft text-brand-dark",
-                  }
-                : s.slug === "project"
-                  ? {
-                      text: "Опережая рынок",
-                      ring: "border-ink/25 ring-1 ring-ink/15",
-                      pill: "bg-ink text-white",
-                    }
-                  : null;
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        {SERVICES.map((s) => {
+          const photo = PHOTOS[s.slug];
           return (
-          <Reveal key={s.slug} delay={(i % 3) * 0.06} className="h-full">
-            <div
-              className={`group relative flex h-full flex-col rounded-2xl border bg-white p-6 shadow-[var(--shadow-soft)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-1 hover:shadow-[var(--shadow-lift)] ${
-                badge ? badge.ring : "border-black/[0.07]"
-              }`}
+            <article
+              key={s.slug}
+              className="flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-[var(--shadow-soft)]"
             >
-              {badge && (
-                <span
-                  className={`mb-3 self-start rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${badge.pill}`}
+              <div className="relative aspect-[16/9] bg-brand-dark">
+                {photo && (
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    quality={90}
+                    sizes="(min-width: 1700px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                )}
+              </div>
+              <div className="flex flex-1 flex-col p-6 md:p-7">
+                <p className="text-sm text-muted">{s.segment}</p>
+                <h3 className="mt-2 text-xl font-semibold tracking-tight text-ink md:text-[1.35rem]">
+                  {s.title}
+                </h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{s.desc}</p>
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  {s.points.map((p) => (
+                    <li
+                      key={p}
+                      className="rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-brand-dark"
+                    >
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href="#lead"
+                  className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand hover:text-brand-dark"
                 >
-                  {badge.text}
-                </span>
-              )}
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-                {s.segment}
-              </p>
-              <h3 className="text-lg font-semibold tracking-tight">{s.title}</h3>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{s.desc}</p>
-              <ul className="mt-5 flex flex-wrap gap-2">
-                {s.points.map((p) => (
-                  <li
-                    key={p}
-                    className="rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-brand-dark"
-                  >
-                    {p}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="#lead"
-                className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand transition-colors group-hover:text-brand-dark"
-              >
-                Оставить заявку
-                <span className="transition-transform group-hover:translate-x-0.5">→</span>
-              </a>
-            </div>
-          </Reveal>
+                  Оставить заявку
+                  <span aria-hidden>→</span>
+                </a>
+              </div>
+            </article>
           );
         })}
       </div>

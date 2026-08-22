@@ -20,14 +20,14 @@ export default function Header() {
   const navHref = (href: string) => (isHome ? href : `/${href}`);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/5 bg-paper/95">
-      <div className={`${SHELL} flex min-h-16 flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5`}>
-        <a href={isHome ? "#top" : "/"} className="flex shrink-0 items-center" aria-label="KOVI Finance — на главную">
+    <header className="sticky top-0 z-50 border-b border-black/5 bg-paper">
+      <div className={`${SHELL} flex min-h-16 flex-nowrap items-center justify-between gap-x-4 py-2.5 xl:gap-x-6`}>
+        <a href={isHome ? "#top" : "/"} className="flex shrink-0 items-center" aria-label="KOVI Finance, на главную">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/logo-primary.svg" alt="KOVI Finance" className="h-8 w-auto" />
         </a>
 
-        <nav className="hidden items-center gap-1 lg:flex xl:gap-2">
+        <nav className="hidden items-center gap-0.5 xl:flex xl:gap-2">
           {NAV.map((n) => {
             const isActive = isHome && active === n.href;
             return (
@@ -58,7 +58,7 @@ export default function Header() {
             Соцсети из шапки убраны: 212px, а бюджет правого блока — 346px. Они никогда
             не помещались рядом с телефоном и кнопкой и вытесняли шапку за контейнер
             на 111px (проверено замерами на 1280–1920). Живут в футере и в моб. меню. */}
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-3 xl:flex">
           {/* Телефон — с 1200px: ниже его место занимает меню.
               Он остаётся в герое, футере и липкой кнопке снизу. */}
           <a
@@ -78,17 +78,25 @@ export default function Header() {
           </a>
         </div>
 
-        <button
-          aria-label="Меню"
-          onClick={() => setOpen((v) => !v)}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-black/10 lg:hidden"
-        >
-          <span className="text-lg">{open ? "✕" : "☰"}</span>
-        </button>
+        <div className="flex shrink-0 items-center gap-2 xl:hidden">
+          <a
+            href={navHref("#lead")}
+            className="hidden whitespace-nowrap rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white sm:inline-flex"
+          >
+            Оставить заявку
+          </a>
+          <button
+            aria-label="Меню"
+            onClick={() => setOpen((v) => !v)}
+            className="grid h-10 w-10 place-items-center rounded-lg border border-black/10"
+          >
+            <span className="text-lg">{open ? "✕" : "☰"}</span>
+          </button>
+        </div>
       </div>
 
       {open && (
-        <div className="border-t border-black/5 bg-paper px-5 py-4 lg:hidden">
+        <div className="border-t border-black/5 bg-paper px-5 py-4 xl:hidden">
           <nav className="flex flex-col gap-3">
             {NAV.map((n) => (
               <a

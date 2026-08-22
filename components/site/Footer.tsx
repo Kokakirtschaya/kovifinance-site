@@ -15,14 +15,12 @@ export default function Footer() {
               Кредиты, гарантии, факторинг, лизинг и проектное финансирование.
             </p>
             <p className="mt-3 max-w-sm text-sm text-white/40">
-              KOVI — от славянского «ковать»: мы выковываем финансовые решения.
+              KOVI от славянского «ковать»: мы выковываем финансовые решения.
             </p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-widest text-white/40">
-              Навигация
-            </h4>
+            <h4 className="text-sm font-semibold text-white/45">Навигация</h4>
             <ul className="mt-4 space-y-2 text-sm">
               {NAV.map((n) => (
                 <li key={n.href}>
@@ -56,9 +54,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold uppercase tracking-widest text-white/40">
-              Контакты
-            </h4>
+            <h4 className="text-sm font-semibold text-white/45">Контакты</h4>
             <ul className="mt-4 space-y-2 text-sm">
               <li>
                 <a href={CONTACTS.phoneHref} className="text-white/80 hover:text-white">
