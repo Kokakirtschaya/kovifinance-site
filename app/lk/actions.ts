@@ -4,7 +4,13 @@ import { headers } from "next/headers";
 import { signIn } from "@/auth";
 import { clientIpFromHeaders, FIFTEEN_MIN, rateLimit } from "@/lib/rate-limit";
 
-export async function requestMagicLink(email: string): Promise<{ error?: string }> {
+export async function requestMagicLink(
+  email: string,
+  pdConsent?: boolean,
+): Promise<{ error?: string }> {
+  if (!pdConsent) {
+    return { error: "Отметьте согласие на обработку персональных данных." };
+  }
   const trimmed = email.trim().toLowerCase();
   if (!trimmed || !trimmed.includes("@")) {
     return { error: "Укажите рабочую почту" };

@@ -4,6 +4,7 @@
 // в переменных ещё может встретиться, его подменяем.
 
 export const CRM_PUBLIC_URL = "https://crm.kovifinance.ru";
+const CRM_TIMEOUT_MS = 8000;
 
 export function crmApiBase(): string | undefined {
   const raw = process.env.CRM_API_URL?.trim();
@@ -51,8 +52,13 @@ export async function createLead(lead: LeadInput): Promise<{ ok: boolean }> {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(lead),
+      signal: AbortSignal.timeout(CRM_TIMEOUT_MS),
     });
-    return { ok: res.ok };
+    if (!res.ok) return { ok: false };
+    const data: unknown = await res.json();
+    return {
+      ok: !!data && typeof data === "object" && "ok" in data && data.ok === true,
+    };
   } catch {
     return { ok: false };
   }
@@ -70,6 +76,7 @@ export async function getApplications(email: string): Promise<CrmResult> {
       {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store", // статусы должны быть свежими
+        signal: AbortSignal.timeout(CRM_TIMEOUT_MS),
       },
     );
     if (!res.ok) return { ok: false, reason: "unreachable" };

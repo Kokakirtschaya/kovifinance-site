@@ -3,7 +3,6 @@ import { Golos_Text, Inter } from "next/font/google";
 import "./globals.css";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import CookieBanner from "@/components/site/CookieBanner";
-import YandexMetrica from "@/components/site/YandexMetrica";
 import ErrorGuard from "@/components/site/ErrorGuard";
 
 // Основной шрифт бренда — Golos Text; Inter — запасной (по бренд-гайду)
@@ -62,7 +61,6 @@ export default function RootLayout({
         <ScrollProgress />
         {children}
         <CookieBanner />
-        <YandexMetrica />
       </body>
     </html>
   );

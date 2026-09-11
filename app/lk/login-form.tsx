@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import PdConsentCheckbox from "@/components/site/PdConsentCheckbox";
 
 // Форма ввода e-mail. Сам вход (signIn) — на сервере, сюда приходит action.
 export default function LoginForm({
   action,
 }: {
-  action: (email: string) => Promise<{ error?: string }>;
+  action: (email: string, pdConsent: boolean) => Promise<{ error?: string }>;
 }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -17,9 +18,15 @@ export default function LoginForm({
       onSubmit={(e) => {
         e.preventDefault();
         setError(null);
+        const form = e.currentTarget;
+        const consented = new FormData(form).get("pdConsent") === "on";
+        if (!consented) {
+          setError("Отметьте согласие на обработку персональных данных.");
+          return;
+        }
         startTransition(async () => {
           try {
-            const result = await action(email);
+            const result = await action(email, true);
             if (result?.error) setError(result.error);
           } catch (e) {
             const digest =
@@ -41,6 +48,7 @@ export default function LoginForm({
         placeholder="you@company.ru"
         className="w-full rounded-xl border border-black/10 bg-paper px-4 py-3 text-sm outline-none focus:border-brand"
       />
+      <PdConsentCheckbox id="lk-pd-consent" />
       <button
         disabled={pending}
         className="w-full rounded-full bg-brand px-6 py-3 font-semibold text-white transition-colors hover:bg-brand-dark disabled:opacity-60"

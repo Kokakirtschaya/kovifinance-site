@@ -10,7 +10,8 @@ export const CONTACTS = {
   instagram: "https://www.instagram.com/kovi_finance/",
   legalName: "ИП Кирцхая Кока Зауриевич",
   inn: "772515515470",
-  policyUpdated: "25 июля 2026 г.",
+  ogrnip: "324774600072260",
+  policyUpdated: "11 сентября 2026 г.",
 };
 
 export const NAV = [

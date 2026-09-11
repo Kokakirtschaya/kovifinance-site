@@ -1,23 +1,10 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import { createLead } from "@/lib/crm";
 import { lookupInn } from "@/lib/checko";
 import { notifyTelegram } from "@/lib/notify";
 import { clientIpFromHeaders, FIFTEEN_MIN, rateLimit } from "@/lib/rate-limit";
-
-type Lead = {
-  name?: string;
-  phone?: string;
-  email?: string;
-  inn?: string;
-  product?: string;
-  // с посадочных страниц приходят свои поля
-  property?: string;
-  pledge?: string;
-  price?: string;
-  city?: string;
-  sum?: string | number;
-  source?: string;
-};
+import { validateLead } from "@/lib/lead-validation";
 
 export async function POST(request: Request) {
   const ip = clientIpFromHeaders(request.headers);
@@ -25,25 +12,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "rate" }, { status: 429 });
   }
 
-  let body: Lead;
+  let input: unknown;
   try {
-    body = await request.json();
+    input = await request.json();
   } catch {
     return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
   }
 
-  const name = (body.name ?? "").trim();
-  const phone = (body.phone ?? "").trim();
-  const email = (body.email ?? "").trim();
-
-  if (!name || phone.replace(/\D/g, "").length < 10) {
-    return NextResponse.json({ ok: false, error: "validation" }, { status: 422 });
+  const validation = validateLead(input);
+  if (!validation.ok) {
+    return NextResponse.json(validation, { status: 422 });
   }
+  const body = validation.lead;
+  const { name, phone, email, inn: innRaw } = body;
+  const requestId = randomUUID();
 
   // ИНН обязателен: проверяем формат/контрольную сумму и существование в Checko.
   // Блокируем только явные фейки: юрлицо (10 цифр), которого нет в ЕГРЮЛ.
   // 12-значный не найден — возможно физлицо без ИП, пропускаем с пометкой.
-  const innRaw = (body.inn ?? "").trim();
   const innCheck = await lookupInn(innRaw);
   if (innCheck.status === "invalid") {
     return NextResponse.json({ ok: false, error: "inn_invalid" }, { status: 422 });
@@ -56,13 +42,13 @@ export async function POST(request: Request) {
 
   // Заголовок заявки: продукт с главной, либо тип объекта/залога с посадочных
   const title =
-    (body.product ?? "").trim() ||
-    (body.property ?? "").trim() ||
-    (body.pledge ?? "").trim() ||
+    body.product ||
+    body.property ||
+    body.pledge ||
     "не указано";
   // Сумма: price/sum с посадочных страниц
-  const amount = String(body.price ?? body.sum ?? "").trim();
-  const source = (body.source ?? "").trim();
+  const amount = body.price || body.sum;
+  const source = body.source;
 
   const lead = { name, phone, email, inn: innRaw, company, title, amount, source };
 
@@ -92,22 +78,29 @@ export async function POST(request: Request) {
       : "") +
     `💼 ${title}` +
     (amount ? `\n💰 ${amount}` : "") +
-    `\n\n${crm.ok ? "✅ в CRM" : "⚠️ CRM недоступна — занести вручную"}`;
+    `\n\n${crm.ok ? "✅ в CRM" : "⚠️ CRM не подтвердила приём — проверить и при необходимости занести вручную"}` +
+    `\nНомер обращения: ${requestId}`;
 
-  const notified = await notifyTelegram(text);
+  const notified = await notifyTelegram(text, requestId);
 
-  // В лог — без телефона и почты. Если не дошло ни в CRM, ни в TG — заявка
-  // всё равно у менеджера в форме/звонке, а логи Timeweb не копия анкеты.
+  // Только технический результат: контакты и произвольные поля в логи не попадают.
   console.log(
     "LEAD",
     JSON.stringify({
-      inn: lead.inn ? `***${lead.inn.slice(-4)}` : "",
-      title,
-      source,
+      requestId,
       crm: crm.ok,
       tg: notified.ok,
     }),
   );
 
-  return NextResponse.json({ ok: true });
+  // Успех означает подтверждённое сохранение в CRM или доставку менеджеру.
+  // Если оба канала не подтвердили приём, форма сохраняет данные для повтора.
+  if (!crm.ok && !notified.ok) {
+    return NextResponse.json(
+      { ok: false, error: "delivery_failed", requestId },
+      { status: 503 },
+    );
+  }
+
+  return NextResponse.json({ ok: true, requestId });
 }

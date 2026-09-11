@@ -4,30 +4,65 @@ import { useEffect, useRef, useState } from "react";
 import { SERVICES, CONTACTS } from "@/lib/site";
 import { SHELL } from "@/lib/layout";
 import { isValidInn, normalizeInn } from "@/lib/inn";
+import { LEAD_LIMITS } from "@/lib/lead-validation";
 import Reveal from "@/components/site/Reveal";
+import PdConsentCheckbox from "@/components/site/PdConsentCheckbox";
 
 type Status = "idle" | "sending" | "ok" | "error";
 
+const SEND_ERRORS: Record<string, string> = {
+  rate: "Слишком много попыток. Попробуйте через 15 минут или позвоните нам.",
+  validation: "Проверьте имя, телефон, e-mail и выбранный продукт.",
+  inn_invalid: "Проверьте ИНН: нужны 10 или 12 цифр с верной контрольной суммой.",
+  inn_not_found: "Организация с таким ИНН не найдена. Проверьте номер.",
+  consent: "Отметьте согласие на обработку персональных данных.",
+};
+const DELIVERY_ERROR =
+  "Не удалось подтвердить отправку. Введённые данные сохранены в форме. Попробуйте ещё раз или позвоните нам.";
+
 export default function LeadForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const submitting = useRef(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (submitting.current) return;
     const form = e.currentTarget;
     const data = Object.fromEntries(new FormData(form).entries());
+    if (data.pdConsent !== "on") {
+      setErrorMessage(SEND_ERRORS.consent);
+      setStatus("error");
+      return;
+    }
 
+    submitting.current = true;
+    setErrorMessage("");
     setStatus("sending");
     try {
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        signal: AbortSignal.timeout(35_000),
       });
-      if (!res.ok) throw new Error("bad response");
+      const result = await res.json();
+      if (!res.ok || result?.ok !== true) {
+        setErrorMessage(
+          typeof result?.error === "string"
+            ? SEND_ERRORS[result.error] ?? DELIVERY_ERROR
+            : DELIVERY_ERROR,
+        );
+        setStatus("error");
+        return;
+      }
       setStatus("ok");
       form.reset();
     } catch {
+      setErrorMessage(DELIVERY_ERROR);
       setStatus("error");
+    } finally {
+      submitting.current = false;
     }
   }
 
@@ -66,7 +101,7 @@ export default function LeadForm() {
 
         <div className="p-8 md:p-12">
           {status === "ok" ? (
-            <div className="flex h-full flex-col items-center justify-center py-10 text-center">
+            <div role="status" className="flex h-full flex-col items-center justify-center py-10 text-center">
               <div className="grid h-16 w-16 place-items-center rounded-full bg-brand-soft text-3xl text-brand">
                 ✓
               </div>
@@ -82,8 +117,8 @@ export default function LeadForm() {
               </button>
             </div>
           ) : (
-            <form onSubmit={onSubmit} className="space-y-4">
-              <Field name="name" label="Имя" placeholder="Как к вам обращаться" required />
+            <form onSubmit={onSubmit} aria-busy={status === "sending"} className="space-y-4">
+              <Field name="name" label="Имя" placeholder="Как к вам обращаться" maxLength={LEAD_LIMITS.name} required />
               <PhoneField />
               <div>
                 <EmailField />
@@ -97,8 +132,9 @@ export default function LeadForm() {
               </div>
               <InnField />
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Что интересует</label>
+                <label htmlFor="product" className="mb-1.5 block text-sm font-medium">Что интересует</label>
                 <select
+                  id="product"
                   name="product"
                   defaultValue=""
                   className="h-12 w-full rounded-xl border border-black/10 bg-paper px-4 text-sm outline-none transition-colors focus:border-brand"
@@ -111,6 +147,8 @@ export default function LeadForm() {
                 </select>
               </div>
 
+              <PdConsentCheckbox id="lead-pd-consent" />
+
               <button
                 type="submit"
                 disabled={status === "sending"}
@@ -120,24 +158,11 @@ export default function LeadForm() {
               </button>
 
               {status === "error" && (
-                <p className="text-sm text-red-600">
-                  Не удалось отправить. Позвоните нам:{" "}
+                <p role="alert" className="text-sm text-red-600">
+                  {errorMessage}{" "}
                   <a href={CONTACTS.phoneHref} className="underline">{CONTACTS.phone}</a>
                 </p>
               )}
-
-              <p className="text-xs leading-relaxed text-muted">
-                Нажимая кнопку, вы соглашаетесь с обработкой персональных данных и принимаете
-                условия{" "}
-                <a
-                  href="/confidentiality"
-                  target="_blank"
-                  className="underline underline-offset-2 hover:text-ink"
-                >
-                  Политики конфиденциальности
-                </a>
-                .
-              </p>
             </form>
           )}
         </div>
@@ -191,6 +216,7 @@ function PhoneField() {
         name="phone"
         type="tel"
         inputMode="tel"
+        maxLength={LEAD_LIMITS.phone}
         required
         placeholder="+7 (999) 999-99-99"
         value={digits === "" ? "" : formatPhone(digits)}
@@ -240,6 +266,7 @@ function EmailField() {
         name="email"
         type="email"
         inputMode="email"
+        maxLength={LEAD_LIMITS.email}
         placeholder="название_почты@домен.ру"
         value={value}
         onChange={(e) => setValue(e.target.value.trim())}
@@ -274,6 +301,9 @@ function InnField() {
   const [touched, setTouched] = useState(false);
   const [check, setCheck] = useState<InnCheck>({ state: "idle" });
   const ref = useRef<HTMLInputElement>(null);
+  const lookupController = useRef<AbortController | null>(null);
+
+  useEffect(() => () => lookupController.current?.abort(), []);
 
   const formatOk = isValidInn(inn);
   const kind: "org" | "ip" = inn.length === 12 ? "ip" : "org";
@@ -291,6 +321,7 @@ function InnField() {
   }, [blocking, inn, formatOk, check.state, orgNotFound]);
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+    lookupController.current?.abort();
     setInn(normalizeInn(e.target.value));
     setCheck({ state: "idle" });
   }
@@ -298,15 +329,21 @@ function InnField() {
   async function onBlur() {
     setTouched(true);
     if (!isValidInn(inn)) return;
+    lookupController.current?.abort();
+    const controller = new AbortController();
+    lookupController.current = controller;
     setCheck({ state: "loading" });
     try {
-      const res = await fetch(`/api/inn?inn=${inn}`);
+      const res = await fetch(`/api/inn?inn=${inn}`, {
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(7000)]),
+      });
       const data = await res.json();
+      if (controller.signal.aborted) return;
       if (data.status === "found") setCheck({ state: "found", name: data.name, kind: data.kind });
       else if (data.status === "not_found") setCheck({ state: "not_found", kind: data.kind });
       else setCheck({ state: "idle" }); // error/unconfigured — не мешаем отправке
     } catch {
-      setCheck({ state: "idle" });
+      if (!controller.signal.aborted) setCheck({ state: "idle" });
     }
   }
 
@@ -320,6 +357,7 @@ function InnField() {
         id="inn"
         name="inn"
         inputMode="numeric"
+        maxLength={LEAD_LIMITS.inn}
         required
         placeholder="10 или 12 цифр"
         value={inn}

@@ -8,7 +8,7 @@ export function normalizeInn(raw: string): string {
 
 /** Проверка контрольной суммы ИНН: 10 знаков (юрлицо) или 12 (ИП/физлицо). */
 export function isValidInn(inn: string): boolean {
-  if (!/^(\d{10}|\d{12})$/.test(inn)) return false;
+  if (!/^(\d{10}|\d{12})$/.test(inn) || /^0+$/.test(inn)) return false;
   const d = inn.split("").map(Number);
   const csum = (coefs: number[]) =>
     (coefs.reduce((sum, c, i) => sum + c * d[i], 0) % 11) % 10;

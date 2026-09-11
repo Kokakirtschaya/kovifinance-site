@@ -24,7 +24,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-2 text-sm">
               {NAV.map((n) => (
                 <li key={n.href}>
-                  <a href={n.href} className="text-white/70 transition-colors hover:text-white">
+                  <a href={`/${n.href}`} className="text-white/70 transition-colors hover:text-white">
                     {n.label}
                   </a>
                 </li>
@@ -73,7 +73,15 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/40 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} {CONTACTS.legalName}. Все права защищены.</p>
-          <p>Информация на сайте не является публичной офертой.</p>
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <a href="/confidentiality" className="transition-colors hover:text-white">
+              Политика конфиденциальности
+            </a>
+            <span className="hidden text-white/20 md:inline" aria-hidden>
+              ·
+            </span>
+            <span>Информация на сайте не является публичной офертой.</span>
+          </p>
         </div>
       </div>
     </footer>

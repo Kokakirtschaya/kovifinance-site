@@ -5,6 +5,7 @@ import { isValidInn, normalizeInn } from "@/lib/inn";
 
 const BASE = (process.env.CHECKO_BASE_URL || "https://api.checko.ru/v2").replace(/\/$/, "");
 const KEY = process.env.CHECKO_API_KEY || "";
+const CHECKO_TIMEOUT_MS = 4000;
 
 export type InnKind = "org" | "ip"; // 10 цифр — юрлицо, 12 — ИП/физлицо
 
@@ -27,7 +28,11 @@ export async function lookupInn(rawInn: string): Promise<InnLookup> {
 
   try {
     const url = `${BASE}/${endpoint}?key=${encodeURIComponent(KEY)}&inn=${inn}`;
-    const res = await fetch(url, { headers: { Accept: "application/json" }, cache: "no-store" });
+    const res = await fetch(url, {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+      signal: AbortSignal.timeout(CHECKO_TIMEOUT_MS),
+    });
     if (res.status === 404) return { status: "not_found", kind };
     if (!res.ok) return { status: "error" };
 

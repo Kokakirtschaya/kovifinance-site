@@ -30,10 +30,13 @@ async function viaRelay(text: string): Promise<NotifyResult> {
       body: JSON.stringify({ text }),
       signal: AbortSignal.timeout(RELAY_TIMEOUT_MS),
     });
-    if (res.ok) return { ok: true, via: "relay" };
-    return { ok: false, reason: `relay_http_${res.status}` };
-  } catch (err) {
-    return { ok: false, reason: `relay_unreachable: ${String(err)}` };
+    if (!res.ok) return { ok: false, reason: `relay_http_${res.status}` };
+    const data = await res.json();
+    return data?.ok === true
+      ? { ok: true, via: "relay" }
+      : { ok: false, reason: "relay_unconfirmed" };
+  } catch {
+    return { ok: false, reason: "relay_unreachable" };
   }
 }
 
@@ -49,22 +52,23 @@ async function viaDirect(text: string): Promise<NotifyResult> {
       body: JSON.stringify({ chat_id: chatId, text }),
       signal: AbortSignal.timeout(DIRECT_TIMEOUT_MS),
     });
-    if (res.ok) return { ok: true, via: "direct" };
-    return { ok: false, reason: `direct_http_${res.status}` };
-  } catch (err) {
-    return { ok: false, reason: `direct_unreachable: ${String(err)}` };
+    if (!res.ok) return { ok: false, reason: `direct_http_${res.status}` };
+    const data = await res.json();
+    return data?.ok === true
+      ? { ok: true, via: "direct" }
+      : { ok: false, reason: "direct_unconfirmed" };
+  } catch {
+    return { ok: false, reason: "direct_unreachable" };
   }
 }
 
 /**
  * Шлёт текст менеджеру. Никогда не бросает исключение — заявка важнее уведомления.
  *
- * Если не доставлено, пишет в лог строку TELEGRAM_FAILED вместе с полным текстом:
- * по ней сбой видно поиском в «Логах приложения», а саму заявку можно достать
- * оттуда руками. Раньше ошибка гасилась молча, и о поломке узнали только через
- * четыре дня — теперь молчания быть не должно.
+ * При сбое пишет TELEGRAM_FAILED с номером обращения и причинами отказа.
+ * Сам текст заявки с контактами в журнал приложения не попадает.
  */
-export async function notifyTelegram(text: string): Promise<NotifyResult> {
+export async function notifyTelegram(text: string, requestId?: string): Promise<NotifyResult> {
   const relay = await viaRelay(text);
   if (relay.ok) return relay;
 
@@ -78,8 +82,7 @@ export async function notifyTelegram(text: string): Promise<NotifyResult> {
     "TELEGRAM_FAILED: уведомление не доставлено ни релеем, ни напрямую.",
     `relay=${relay.reason}`,
     `direct=${direct.reason}`,
-    "| текст:",
-    text,
+    `requestId=${requestId ?? "unknown"}`,
   );
   return { ok: false, reason: `${relay.reason}; ${direct.reason}` };
 }
