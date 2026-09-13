@@ -1,5 +1,6 @@
 import { isValidInn } from "@/lib/inn";
 import { SERVICES } from "@/lib/site";
+import { PD_CONSENT } from "@/lib/pd-consent";
 
 export const LEAD_LIMITS = {
   name: 120,
@@ -19,7 +20,7 @@ type LeadFields = Record<TextField, string> & { sum: string };
 
 type LeadValidation =
   | { ok: true; lead: LeadFields }
-  | { ok: false; error: "validation" | "inn_invalid" | "consent"; field?: TextField | "sum" | "pdConsent" };
+  | { ok: false; error: "validation" | "inn_invalid" | "consent" | "consent_version"; field?: TextField | "sum" | "pdConsent" | "pdConsentVersion" };
 
 function isConsentGiven(value: unknown): boolean {
   return value === true || value === "true" || value === "on" || value === "1";
@@ -78,6 +79,9 @@ export function validateLead(body: unknown): LeadValidation {
   }
   if (!isConsentGiven(input.pdConsent)) {
     return { ok: false, error: "consent", field: "pdConsent" };
+  }
+  if (input.pdConsentVersion !== PD_CONSENT.version) {
+    return { ok: false, error: "consent_version", field: "pdConsentVersion" };
   }
 
   const sum = input.sum;

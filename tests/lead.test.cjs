@@ -36,9 +36,11 @@ function load(file, deps = {}, globals = {}) {
 
 const inn = load("lib/inn.ts");
 const site = load("lib/site.ts");
+const consentTools = load("lib/pd-consent.ts");
 const validation = load("lib/lead-validation.ts", {
   "@/lib/inn": inn,
   "@/lib/site": site,
+  "@/lib/pd-consent": consentTools,
 });
 const crmTools = load("lib/crm.ts");
 const notificationTools = load("lib/notify.ts", { "@/lib/crm": crmTools });
@@ -55,6 +57,7 @@ const fixture = {
   inn: "1234567894",
   product: site.SERVICES[0].title,
   pdConsent: true,
+  pdConsentVersion: consentTools.PD_CONSENT.version,
 };
 
 function leadRequest(body, raw = false) {
@@ -71,6 +74,7 @@ function handler({ crmOk = true, tgOk = true, lookup = { status: "unconfigured" 
     "next/server": { NextResponse },
     "node:crypto": { randomUUID },
     "@/lib/lead-validation": validation,
+    "@/lib/pd-consent": consentTools,
     "@/lib/crm": {
       createLead: async (body) => {
         calls.crm.push(body);
@@ -140,6 +144,41 @@ test("lead is rejected without explicit personal-data consent", async () => {
   assert.equal(response.status, 422);
   assert.equal((await response.json()).error, "consent");
   assert.equal(calls.lookup.length + calls.crm.length + calls.tg.length, 0);
+});
+
+test("unknown, missing or stale consent versions stop before integrations", async () => {
+  const { POST, calls } = handler();
+  for (const pdConsentVersion of [undefined, null, false, [], {}, "", "2026-09-11", "future"]) {
+    const response = await POST(leadRequest({ ...fixture, pdConsentVersion }));
+    assert.equal(response.status, 422);
+    assert.equal((await response.json()).error, "consent_version");
+  }
+  assert.equal(calls.lookup.length + calls.crm.length + calls.tg.length, 0);
+});
+
+test("server records the displayed text and its own timestamp, ignoring client evidence", async () => {
+  const { POST, calls } = handler();
+  const before = Date.now();
+  const response = await POST(leadRequest({
+    ...fixture,
+    acceptedAt: "2000-01-01T00:00:00.000Z",
+    consent: { acceptedAt: "2000-01-01T00:00:00.000Z", version: "forged", text: "forged" },
+    pdConsentText: "forged", policyUrl: "https://evil.example.invalid",
+  }));
+  const body = await response.json();
+  const consent = calls.crm[0].consent;
+  assert.equal(response.status, 200);
+  assert.equal(consent.accepted, true);
+  assert.equal(consent.method, "checkbox");
+  assert.equal(consent.requestId, body.requestId);
+  assert.equal(consent.version, fixture.pdConsentVersion);
+  assert.equal(consent.text, consentTools.PD_CONSENT_TEXT);
+  assert.equal(consent.policyUrl, consentTools.PD_CONSENT.policyUrl);
+  assert.equal(consent.policyVersion, consentTools.PD_CONSENT.policyVersion);
+  assert.ok(Date.parse(consent.acceptedAt) >= before && Date.parse(consent.acceptedAt) <= Date.now());
+  const outgoing = JSON.stringify({ notices: calls.tg, text: calls.tgText, logs: calls.logs });
+  for (const value of [consent.text, consent.version, consent.acceptedAt, "forged"])
+    assert.ok(!outgoing.includes(value));
 });
 
 test("invalid contact, product, INN and unsafe numeric values are rejected", () => {
@@ -232,13 +271,13 @@ test("legacy landing fields still reach CRM", async () => {
 
 const crmEnv = { CRM_API_URL: "https://crm.example.invalid", CRM_API_TOKEN: "synthetic-token" };
 
-test("CRM requires explicit JSON confirmation, not just HTTP 200", async () => {
-  for (const reply of [{ ok: true }, { ok: false }, {}, null, "html"]) {
+test("CRM must explicitly confirm both the lead and its consent were saved", async () => {
+  for (const reply of [{ ok: true, consentSaved: true }, { ok: true }, { ok: true, consentSaved: false }, { ok: true, consentSaved: "true" }, { ok: false, consentSaved: true }, {}, null, "html"]) {
     const crm = load("lib/crm.ts", {}, {
       process: { env: crmEnv },
       fetch: async () => Response.json(reply),
     });
-    assert.equal((await crm.createLead(fixture)).ok, reply?.ok === true);
+    assert.equal((await crm.createLead(fixture)).ok, reply?.ok === true && reply?.consentSaved === true);
   }
 });
 
@@ -246,7 +285,7 @@ test("CRM keeps only safe record IDs for notification links", async () => {
   for (const ids of [crmIds, {}, { dealId: fixture.email, companyId: "../../api/export?token=secret" }, { dealId: {}, companyId: 42 }]) {
     const crm = load("lib/crm.ts", {}, {
       process: { env: crmEnv },
-      fetch: async () => Response.json({ ok: true, ...ids, name: fixture.name, email: fixture.email, url: "https://evil.example.invalid" }),
+      fetch: async () => Response.json({ ok: true, consentSaved: true, ...ids, name: fixture.name, email: fixture.email, url: "https://evil.example.invalid" }),
     });
     const result = await crm.createLead(fixture);
     assert.equal(result.ok, true);
@@ -256,6 +295,20 @@ test("CRM keeps only safe record IDs for notification links", async () => {
     assert.equal(result.email, undefined);
     assert.equal(result.url, undefined);
   }
+});
+
+test("CRM transport sends the consent snapshot to the protected API", async () => {
+  const consent = consentTools.createLeadConsent(notice.requestId);
+  const crm = load("lib/crm.ts", {}, {
+    process: { env: crmEnv },
+    fetch: async (url, options) => {
+      assert.equal(url, "https://crm.example.invalid/api/public/leads");
+      assert.equal(options.headers.Authorization, "Bearer synthetic-token");
+      assert.equal(JSON.stringify(JSON.parse(options.body).consent), JSON.stringify(consent));
+      return Response.json({ ok: true, consentSaved: true, ...crmIds });
+    },
+  });
+  assert.equal((await crm.createLead({ ...fixture, consent })).ok, true);
 });
 
 test("notification rejects arbitrary text and does not echo untrusted IDs or extra fields", () => {

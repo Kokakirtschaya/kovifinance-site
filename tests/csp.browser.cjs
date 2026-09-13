@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports -- Optional browser checks use CommonJS. */
 const assert = require("node:assert/strict");
+const { PD_CONSENT, PD_CONSENT_TEXT } = require("./helpers/load-ts.cjs")("lib/pd-consent.ts");
 const { chromium, webkit } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
 
 const target = new URL(process.argv[2] || "https://localhost:3443");
@@ -32,7 +33,11 @@ async function checkBrowser(name, browserType, mobile) {
     if (url.pathname === "/api/lead" && request.method() === "POST") {
       // Exercise the live form without creating a lead or notifying anyone.
       mockedLeads++;
-      return route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ ok: false, error: "delivery_failed" }) });
+      const body = request.postDataJSON();
+      assert.equal(body.pdConsent, "on");
+      assert.equal(body.pdConsentVersion, PD_CONSENT.version);
+      assert.equal(body.consent, undefined, "Browser must not supply the server evidence");
+      return route.fulfill({ status: mockedLeads === 1 ? 503 : 422, contentType: "application/json", body: JSON.stringify({ ok: false, error: mockedLeads === 1 ? "delivery_failed" : "consent_version" }) });
     }
     if (url.pathname === "/api/clienterr") return route.fulfill({ status: 200, contentType: "application/json", body: '{"ok":true}' });
     if (reportOnly && request.resourceType() === "document") {
@@ -88,6 +93,9 @@ async function checkBrowser(name, browserType, mobile) {
     await noViolations();
 
     const form = page.locator("#lead form");
+    assert.equal(await form.locator('[name="pdConsent"]').isChecked(), false);
+    assert.equal(await form.locator('[name="pdConsentVersion"]').inputValue(), PD_CONSENT.version);
+    assert.equal((await form.locator('label[for="lead-pd-consent"]').innerText()).trim(), PD_CONSENT_TEXT);
     await form.locator('[name="name"]').fill("CSP browser check");
     await form.locator('[name="phone"]').fill("+79990000000");
     await form.locator('[name="inn"]').fill("1234567894");
@@ -100,6 +108,10 @@ async function checkBrowser(name, browserType, mobile) {
     assert.equal(await form.locator('[name="name"]').inputValue(), "CSP browser check");
     assert.equal(mockedLeads, 1);
     assert.equal(mockedInn, 1);
+    await form.getByRole("button", { name: "Отправить заявку", exact: true }).click();
+    await form.getByRole("alert").filter({ hasText: "Условия согласия обновились" }).waitFor();
+    assert.equal(await form.locator('[name="name"]').inputValue(), "CSP browser check");
+    assert.equal(mockedLeads, 2);
     await noViolations();
 
     await open("/lk");

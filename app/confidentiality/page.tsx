@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Footer from "@/components/site/Footer";
 import { CONTACTS } from "@/lib/site";
+import { PD_CONSENT } from "@/lib/pd-consent";
 
 export const metadata: Metadata = {
   title: "Политика конфиденциальности и обработки персональных данных",
@@ -44,6 +45,7 @@ export default function ConfidentialityPage() {
               https://kovifinance.ru/
             </a>{" "}
             · Дата последнего обновления: {CONTACTS.policyUpdated}
+            {" "}· Версия: {PD_CONSENT.policyVersion}
           </p>
 
           <div className="policy mt-10 space-y-10">

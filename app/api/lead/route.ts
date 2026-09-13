@@ -5,6 +5,7 @@ import { lookupInn } from "@/lib/checko";
 import { notifyTelegram } from "@/lib/notify";
 import { clientIpFromHeaders, FIFTEEN_MIN, rateLimit } from "@/lib/rate-limit";
 import { validateLead } from "@/lib/lead-validation";
+import { createLeadConsent } from "@/lib/pd-consent";
 
 export async function POST(request: Request) {
   const ip = clientIpFromHeaders(request.headers);
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
   const body = validation.lead;
   const { name, phone, email, inn: innRaw } = body;
   const requestId = randomUUID();
+  const consent = createLeadConsent(requestId);
 
   // ИНН обязателен: проверяем формат/контрольную сумму и существование в Checko.
   // Блокируем только явные фейки: юрлицо (10 цифр), которого нет в ЕГРЮЛ.
@@ -59,6 +61,7 @@ export async function POST(request: Request) {
     title,
     amount: amount || undefined,
     source: source || undefined,
+    consent,
   });
 
   // 2) В Telegram передаём только технический номер и идентификаторы CRM.

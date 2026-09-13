@@ -1,3 +1,5 @@
+import type { LeadConsent } from "@/lib/pd-consent";
+
 // Связь личного кабинета с CRM Kovi: статусы заявок клиента по e-mail.
 // Вызывается только на сервере (токен не должен попасть в браузер).
 // Боевой адрес CRM — только crm.kovifinance.ru. Старый crm.koka-net.ru
@@ -38,6 +40,7 @@ export type LeadInput = {
   title?: string; // продукт/услуга
   amount?: string;
   source?: string; // с какой страницы
+  consent: LeadConsent;
 };
 
 export type LeadResult =
@@ -65,7 +68,10 @@ export async function createLead(lead: LeadInput): Promise<LeadResult> {
     });
     if (!res.ok) return { ok: false };
     const data: unknown = await res.json();
-    if (!data || typeof data !== "object" || !("ok" in data) || data.ok !== true) {
+    if (
+      !data || typeof data !== "object" || !("ok" in data) || data.ok !== true ||
+      !("consentSaved" in data) || data.consentSaved !== true
+    ) {
       return { ok: false };
     }
     return {
