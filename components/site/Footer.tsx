@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { NAV, CONTACTS } from "@/lib/site";
 import { SHELL } from "@/lib/layout";
@@ -18,8 +19,12 @@ export default function Footer() {
           <div>
             <p className="eyebrow text-white/50">Навигация</p>
             <ul className="mt-3 space-y-0.5 text-sm">
-              {NAV.map(n => <li key={n.href}><Link href={n.href === "#cases" ? "/cases" : `/${n.href}`} className="inline-flex min-h-9 items-center text-white/75 hover:text-white">{n.label}</Link></li>)}
-              <li><Link href="/agents" className="inline-flex min-h-9 items-center text-white/75 hover:text-white">Агентам</Link></li>
+              {NAV.map(n => (
+                <Fragment key={n.href}>
+                  <li><Link href={n.href === "#cases" ? "/cases" : `/${n.href}`} className="inline-flex min-h-9 items-center text-white/75 hover:text-white">{n.label}</Link></li>
+                  {n.href === "#process" && <li><Link href="/agents" className="inline-flex min-h-9 items-center text-white/75 hover:text-white">Агентам</Link></li>}
+                </Fragment>
+              ))}
               <li><Link href="/crm" className="inline-flex min-h-9 items-center text-white/75 hover:text-white">KOVI CRM</Link></li>
               <li><Link href="/lk" className="inline-flex min-h-9 items-center text-[#d9bd75] hover:text-white">Личный кабинет</Link></li>
             </ul>
