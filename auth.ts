@@ -1,10 +1,23 @@
-import NextAuth from "next-auth";
+import NextAuth, { AuthError } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { Provider } from "next-auth/providers";
 import nodemailer from "nodemailer";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { allowMagicLink } from "@/lib/auth-rate-limit";
+
+const isDevelopment = process.env.NODE_ENV === "development";
+const emailErrorCodes = new Set([
+  "AUTH_EMAIL_UNCONFIGURED",
+  "AUTH_EMAIL_HTTP_UNREACHABLE",
+  "AUTH_EMAIL_HTTP_REJECTED",
+  "AUTH_EMAIL_RECIPIENT_REJECTED",
+  "AUTH_EMAIL_SMTP_FAILED",
+]);
+
+function hasEmailTransport(): boolean {
+  return !!(process.env.UNISENDER_API_KEY?.trim() || process.env.SMTP_HOST?.trim());
+}
 
 // Письмо со ссылкой для входа. Бренд KOVI: тёмный герой, жёлтая кнопка-акцент.
 function loginEmailHtml(url: string): string {
@@ -45,75 +58,73 @@ function loginEmailHtml(url: string): string {
  * Вход в личный кабинет по магик-линку (без пароля): человек вводит e-mail,
  * получает ссылку, переход по ней создаёт сессию. Владение почтой = доказательство.
  *
- * На локалке письма НЕ отправляются — ссылка печатается в консоль dev-сервера.
- * Реальную отправку (SMTP) подключим на этапе прода.
+ * Письмо отправляется через Unisender Go или SMTP. Консольная ссылка без
+ * почтового транспорта и предпросмотр Ethereal доступны только в development.
  */
-const magicLink: Provider = {
-  id: "email",
-  type: "email",
-  name: "Email",
-  from: "no-reply@kovifinance.ru",
-  maxAge: 15 * 60, // ссылка живёт 15 минут
-  async sendVerificationRequest({ identifier, url }) {
-    const subject = "Вход в личный кабинет KOVI Finance";
-    const text = `Ссылка для входа (действует 15 минут):\n${url}`;
+async function sendLoginEmail(identifier: string, url: string): Promise<void> {
+  const subject = "Вход в личный кабинет KOVI Finance";
+  const text = `Ссылка для входа (действует 15 минут):\n${url}`;
+  const apiKey = process.env.UNISENDER_API_KEY?.trim();
+  const smtpHost = process.env.SMTP_HOST?.trim();
 
-    // Первый приоритет — HTTP API Unisender Go.
-    //
-    // Почему не SMTP: из приложения на Timeweb исходящие подключения к
-    // smtp.yandex.ru:465 и :587 висят до таймаута (~120 с) и обрываются, при этом
-    // ни одного ответа SMTP-уровня — соединение не устанавливается вовсе.
-    // HTTPS с того же контейнера работает штатно (проверено запросом к Checko),
-    // поэтому отправка через обычный порт 443 обходит проблему целиком.
-    // Сервис российский — адреса получателей, а это ПДн, не покидают РФ.
-    if (process.env.UNISENDER_API_KEY) {
-      const res = await fetch(
-        "https://goapi.unisender.ru/ru/transactional/api/v1/email/send.json",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "X-API-KEY": process.env.UNISENDER_API_KEY,
-          },
-          body: JSON.stringify({
-            message: {
-              recipients: [{ email: identifier }],
-              subject,
-              body: { html: loginEmailHtml(url), plaintext: text },
-              from_email: process.env.EMAIL_FROM ?? "info@kovifinance.ru",
-              from_name: "KOVI Finance",
-              // Подмену ссылок на трекинговые отключаем намеренно. Ссылка входа
-              // одноразовая, а почтовые фильтры и антивирусы сами открывают ссылки
-              // в письмах для проверки — такой переход сожжёт токен, и клиент,
-              // перейдя следом, получит ошибку. Статистика кликов тут не нужна.
-              track_links: 0,
-              track_read: 0,
-            },
-          }),
+  // Первый приоритет — HTTP API Unisender Go.
+  //
+  // Почему не SMTP: из приложения на Timeweb исходящие подключения к
+  // smtp.yandex.ru:465 и :587 висят до таймаута (~120 с) и обрываются, при этом
+  // ни одного ответа SMTP-уровня — соединение не устанавливается вовсе.
+  // HTTPS с того же контейнера работает штатно (проверено запросом к Checko),
+  // поэтому отправка через обычный порт 443 обходит проблему целиком.
+  // Сервис российский — адреса получателей, а это ПДн, не покидают РФ.
+  if (apiKey) {
+    const res = await fetch(
+      "https://goapi.unisender.ru/ru/transactional/api/v1/email/send.json",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-API-KEY": apiKey,
         },
-      );
+        body: JSON.stringify({
+          message: {
+            recipients: [{ email: identifier }],
+            subject,
+            body: { html: loginEmailHtml(url), plaintext: text },
+            from_email: process.env.EMAIL_FROM ?? "info@kovifinance.ru",
+            from_name: "KOVI Finance",
+            // Подмену ссылок на трекинговые отключаем намеренно. Ссылка входа
+            // одноразовая, а почтовые фильтры и антивирусы сами открывают ссылки
+            // в письмах для проверки — такой переход сожжёт токен, и клиент,
+            // перейдя следом, получит ошибку. Статистика кликов тут не нужна.
+            track_links: 0,
+            track_read: 0,
+          },
+        }),
+      },
+    ).catch(() => {
+      // Исключения транспорта могут содержать URL, адрес или тело письма.
+      throw new Error("AUTH_EMAIL_HTTP_UNREACHABLE");
+    });
 
-      const data = await res.json().catch(() => null);
-      // Сервис отвечает 200 и при отказе конкретному адресу, поэтому мало
-      // проверить res.ok — нужен status в теле и пустой failed_emails.
-      if (!res.ok || data?.status !== "success") {
-        throw new Error(
-          `Unisender Go не принял письмо (HTTP ${res.status}): ${JSON.stringify(data)}`,
-        );
-      }
-      const failed = data.failed_emails ?? {};
-      if (Object.keys(failed).length > 0) {
-        throw new Error(`Unisender Go отклонил адрес: ${JSON.stringify(failed)}`);
-      }
-      return;
+    const data = await res.json().catch(() => null);
+    // Сервис отвечает 200 и при отказе конкретному адресу, поэтому мало
+    // проверить res.ok — нужен status в теле и пустой failed_emails.
+    if (!res.ok || data?.status !== "success") {
+      throw new Error("AUTH_EMAIL_HTTP_REJECTED");
     }
+    const failed = data.failed_emails ?? {};
+    if (Object.keys(failed).length > 0) {
+      throw new Error("AUTH_EMAIL_RECIPIENT_REJECTED");
+    }
+    return;
+  }
 
-    // Запасной путь: если ключа нет, а SMTP задан — шлём по SMTP.
-    // Пригодится, когда Timeweb починит маршрут и захочется вернуться на Яндекс.
-    if (process.env.SMTP_HOST) {
+  // Запасной путь: если ключа нет, а SMTP задан — шлём по SMTP.
+  // Пригодится, когда Timeweb починит маршрут и захочется вернуться на Яндекс.
+  if (smtpHost) {
+    try {
       const transport = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
+        host: smtpHost,
         port: Number(process.env.SMTP_PORT ?? 465),
         secure: Number(process.env.SMTP_PORT ?? 465) === 465, // 465 = SSL, 587 = STARTTLS
         auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD },
@@ -125,12 +136,35 @@ const magicLink: Provider = {
         text,
         html: loginEmailHtml(url),
       });
-      // Для тестового ящика Ethereal — ссылка на просмотр письма; для реального SMTP = false
-      const preview = nodemailer.getTestMessageUrl(info);
-      if (preview) console.log("\n📧 Просмотр письма (Ethereal):\n   " + preview + "\n");
-      return;
+      if (isDevelopment) {
+        const preview = nodemailer.getTestMessageUrl(info);
+        if (preview) console.log("\n📧 Просмотр письма (Ethereal):\n   " + preview + "\n");
+      }
+    } catch {
+      throw new Error("AUTH_EMAIL_SMTP_FAILED");
     }
+    return;
+  }
+  if (isDevelopment) {
     console.log("\n🔑 Ссылка для входа в ЛК (" + identifier + "):\n   " + url + "\n");
+    return;
+  }
+  throw new Error("AUTH_EMAIL_UNCONFIGURED");
+}
+
+const magicLink: Provider = {
+  id: "email",
+  type: "email",
+  name: "Email",
+  from: "no-reply@kovifinance.ru",
+  maxAge: 15 * 60, // ссылка живёт 15 минут
+  sendVerificationRequest({ identifier, url }) {
+    const sending = sendLoginEmail(identifier, url);
+    // Auth.js хеширует токен до Promise.all: мгновенный отказ транспорта
+    // иначе успевает стать unhandled rejection. Обработчик подключаем сразу,
+    // но возвращаем исходный Promise: Auth.js по-прежнему получает отказ.
+    void sending.catch(() => {});
+    return sending;
   },
   options: {},
 };
@@ -139,6 +173,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [magicLink],
   session: { strategy: "database" }, // магик-линк требует сессий в БД
+  debug: false,
+  // Стандартный logger Auth.js выводит message, cause и метаданные целиком.
+  // Вне development оставляем только технический код, без токенов и адресов.
+  logger: isDevelopment ? undefined : {
+    error(error) {
+      const code = error instanceof AuthError
+        ? error.type
+        : emailErrorCodes.has(error.message) ? error.message : "Unknown";
+      console.error("AUTH_ERROR", code);
+    },
+    warn(code) { console.warn("AUTH_WARNING", code); },
+    debug() {},
+  },
   callbacks: {
     async signIn({ user, email }) {
       // Auth.js вызывает этот хук ДО создания токена и отправки письма:
@@ -146,6 +193,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // в форме оставляла второй путь без ограничений.
       // Открытие уже выданной ссылки не расходует лимит отправки.
       if (!email?.verificationRequest) return true;
+
+      if (!isDevelopment && !hasEmailTransport()) {
+        console.error("AUTH_EMAIL_UNCONFIGURED");
+        return "/lk?error=unavailable";
+      }
 
       try {
         const allowed = await allowMagicLink(user.email ?? "", await headers());

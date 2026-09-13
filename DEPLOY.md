@@ -56,8 +56,11 @@ Timeweb (из-за требования ЕСИА к идентификации �
 - [ ] `DATABASE_URL` — Managed PostgreSQL (шаг 2).
 - [ ] `AUTH_SECRET` — новый секрет (`openssl rand -base64 32`), НЕ из локалки.
 - [ ] `AUTH_URL` — `https://kovifinance.ru`.
-- [ ] `SMTP_HOST/PORT/USER/PASSWORD`, `EMAIL_FROM` — **боевой** SMTP (почта на домене
-      kovifinance.ru), а не тестовый Ethereal. Нужен для магик-линка в ЛК.
+- [ ] `UNISENDER_API_KEY`, `EMAIL_FROM` — отправка ссылок входа через Unisender Go
+      по HTTPS; при наличии ключа этот транспорт имеет приоритет.
+- [ ] Либо `SMTP_HOST/PORT/USER/PASSWORD`, `EMAIL_FROM` — боевой SMTP, а не Ethereal.
+      Без настроенного транспорта в production запрос отклоняется до создания
+      токена. Ссылки входа и предпросмотры писем в логи не выводятся.
 - [ ] `CRM_API_URL` = `https://crm.kovifinance.ru`, `CRM_API_TOKEN` = `PUBLIC_API_TOKEN` в CRM.
 - [ ] `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` — чтобы заявки уходили в Telegram.
 - [ ] `CHECKO_API_KEY`, `CHECKO_BASE_URL` — проверка ИНН в форме.
