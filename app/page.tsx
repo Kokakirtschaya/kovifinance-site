@@ -14,6 +14,7 @@ import Footer from "@/components/site/Footer";
 import StickyCTA from "@/components/site/StickyCTA";
 import ActiveSection from "@/components/site/ActiveSection";
 import { CONTACTS } from "@/lib/site";
+import { headers } from "next/headers";
 
 const schema = {
   "@context": "https://schema.org",
@@ -30,11 +31,13 @@ const schema = {
   sameAs: [CONTACTS.telegram, CONTACTS.youtube, CONTACTS.instagram],
 };
 
-export default function Home() {
+export default async function Home() {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <>
       <script
         type="application/ld+json"
+        nonce={nonce}
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <Header />

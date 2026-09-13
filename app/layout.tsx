@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Golos_Text, Inter } from "next/font/google";
+import { connection } from "next/server";
 import "./globals.css";
 import ScrollProgress from "@/components/site/ScrollProgress";
 import CookieBanner from "@/components/site/CookieBanner";
@@ -47,11 +48,13 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // CSP использует новый nonce на каждый ответ; статический HTML не подходит.
+  await connection();
   return (
     <html lang="ru" className={`${golos.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
