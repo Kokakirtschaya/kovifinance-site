@@ -2,12 +2,11 @@ import Header from "@/components/site/Header";
 import Hero from "@/components/site/Hero";
 import TrustBar from "@/components/site/TrustBar";
 import Services from "@/components/site/Services";
+import BusinessTasks from "@/components/site/BusinessTasks";
 import Calculator from "@/components/site/Calculator";
 import Process from "@/components/site/Process";
-import Agents from "@/components/site/Agents";
-import CrmTeaser from "@/components/site/CrmTeaser";
+import MoreWays from "@/components/site/MoreWays";
 import Team from "@/components/site/Team";
-import BrandLegend from "@/components/site/BrandLegend";
 import FAQ from "@/components/site/FAQ";
 import LeadForm from "@/components/site/LeadForm";
 import Footer from "@/components/site/Footer";
@@ -45,12 +44,11 @@ export default async function Home() {
         <Hero />
         <TrustBar />
         <Services />
-        <Calculator />
-        <Process />
-        <Agents />
-        <CrmTeaser />
+        <BusinessTasks />
         <Team />
-        <BrandLegend />
+        <Process />
+        <Calculator />
+        <MoreWays />
         <FAQ />
         <LeadForm />
       </main>

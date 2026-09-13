@@ -1,30 +1,18 @@
-import { TRUST_MARQUEE } from "@/lib/site";
+import { SHELL } from "@/lib/layout";
+import SiteIcon from "@/components/site/SiteIcon";
 
 export default function TrustBar() {
-  const items = [...TRUST_MARQUEE, ...TRUST_MARQUEE];
-
   return (
-    <section className="border-b border-black/5 bg-paper py-10">
-      <div className="mx-auto max-w-3xl px-5 text-center">
-        <p className="text-lg font-semibold text-ink">Финансовые советники для бизнеса</p>
-        <p className="mt-2 text-base leading-relaxed text-muted">
-          Разбираем задачу, подбираем инструмент и структурируем сделку: от заявки до денег.
-          Советуем <span className="text-brand">исходя из вашей выгоды, а не банковской</span>.
-        </p>
-      </div>
-
-      <div className="relative mt-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-        <div className="flex w-max animate-marquee items-center gap-3 pr-3">
-          {items.map((item, i) => (
-            <span
-              key={i}
-              className="whitespace-nowrap rounded-full border border-black/10 bg-white px-5 py-2 text-sm font-medium text-ink/70"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
-    </section>
+    <div className="border-b border-black/[0.08] bg-paper-2/60">
+      <ul className={`${SHELL} grid gap-4 py-6 text-sm text-ink/80 sm:grid-cols-3 sm:gap-6 sm:py-7`}>
+        {[
+          ["banks", "Подбираем банк под вашу задачу"],
+          ["manager", "Работаем напрямую с основателем"],
+          ["result", "Получаем оплату за результат"],
+        ].map(([icon, label]) => (
+          <li key={icon} className="flex items-center gap-3"><SiteIcon name={icon} className="size-5 shrink-0 text-brand" />{label}</li>
+        ))}
+      </ul>
+    </div>
   );
 }

@@ -15,8 +15,8 @@
 
   --font-sans: var(--font-golos), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-soft: 0 1px 2px rgba(11, 15, 20, 0.04), 0 8px 30px rgba(11, 15, 20, 0.06);
-  --shadow-lift: 0 2px 4px rgba(11, 15, 20, 0.05), 0 24px 60px rgba(11, 15, 20, 0.14);
+  --shadow-soft: 0 4px 18px rgba(11, 15, 20, 0.035);
+  --shadow-lift: 0 12px 36px rgba(11, 15, 20, 0.09);
 }
 
 :root {
@@ -87,6 +87,59 @@ body {
 /* Типографика: балансируем заголовки, убираем «сирот» в абзацах */
 h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
+
+@layer components {
+  .section-space { padding-block: clamp(3.25rem, 6vw, 5.5rem); }
+  .section-heading {
+    font-size: clamp(1.875rem, 3.2vw, 3.25rem);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+  }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .button-primary, .button-secondary {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border-radius: 0.75rem;
+    padding: 0.875rem 1.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    transition: background-color 180ms, border-color 180ms;
+  }
+  .button-primary { background: var(--color-brand); color: white; }
+  .button-primary:hover { background: var(--color-brand-dark); }
+  .button-secondary { border: 1px solid currentColor; }
+  .text-link {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--color-brand-dark);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .text-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+}
+
+::selection { background: #c6dfd1; color: var(--color-ink); }
+.faq-item summary { list-style: none; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item[open] .faq-plus { transform: rotate(45deg); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .service-card { transition: border-color 180ms, background-color 180ms; }
+}
 
 @keyframes rise {
   from { opacity: 0; transform: translateY(18px); }

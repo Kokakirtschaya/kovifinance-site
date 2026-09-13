@@ -68,39 +68,25 @@ export default function LeadForm() {
   }
 
   return (
-    <section id="lead" className={`${SHELL} py-20 md:py-28`}>
+    <section id="lead" className={`${SHELL} section-space`}>
       <Reveal>
-      <div className="grid overflow-hidden rounded-3xl border border-black/[0.07] bg-white shadow-[var(--shadow-lift)] lg:grid-cols-[1fr_1.1fr]">
-        <div className="relative bg-ink p-8 text-paper md:p-12">
-          <div className="grain pointer-events-none absolute inset-0 opacity-50" />
-          <div className="relative">
-            <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">
-              Оставьте заявку
-            </h2>
-            <p className="mt-4 text-white/70">
-              Перезвоним в течение дня, бесплатно разберём задачу и предложим реальные
-              варианты финансирования, если они возможны.
+      <div className="grid overflow-hidden rounded-2xl border border-black/10 bg-white lg:grid-cols-[0.85fr_1.15fr]">
+        <div className="flex flex-col justify-between bg-ink p-6 text-paper sm:p-8 lg:p-10">
+          <div>
+            <p className="eyebrow mb-4 text-[#d9bd75]">Первый шаг</p>
+            <h2 className="section-heading max-w-[16ch]">Обсудим вашу задачу</h2>
+            <p className="mt-4 max-w-[38ch] text-sm leading-relaxed text-white/70 sm:text-base">
+              Оставьте контакты. Перезвоним в течение дня, разберём ситуацию и оценим варианты финансирования.
             </p>
-            <ul className="mt-8 grid grid-cols-2 gap-3 text-sm text-white/80">
-              <li className="flex gap-3"><span className="text-gold-bright">✓</span> Без обязательств и предоплаты</li>
-              <li className="flex gap-3"><span className="text-gold-bright">✓</span> Быстро</li>
-              <li className="flex gap-3"><span className="text-gold-bright">✓</span> Грамотно</li>
-              <li className="flex gap-3"><span className="text-gold-bright">✓</span> Конфиденциально</li>
-              <li className="flex gap-3"><span className="text-gold-bright">✓</span> Оплата за результат</li>
-              <li className="flex gap-3"><span className="text-gold-bright">✓</span> Честно</li>
-            </ul>
-            <div className="mt-10 space-y-1 text-sm">
-              <a href={CONTACTS.phoneHref} className="block font-medium text-white">
-                {CONTACTS.phone}
-              </a>
-              <a href={CONTACTS.emailHref} className="block text-white/70">
-                {CONTACTS.email}
-              </a>
-            </div>
+            <p className="mt-4 text-xs leading-relaxed text-white/60 sm:text-sm">Первая консультация бесплатна. Без предоплаты.</p>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm lg:mt-12 lg:block lg:space-y-3">
+            <a href={CONTACTS.phoneHref} className="block font-medium text-white">{CONTACTS.phone}</a>
+            <a href={CONTACTS.emailHref} className="block text-white/70 hover:text-white">{CONTACTS.email}</a>
           </div>
         </div>
 
-        <div className="p-8 md:p-12">
+        <div className="p-6 sm:p-8 lg:p-10">
           {status === "ok" ? (
             <div role="status" className="flex h-full flex-col items-center justify-center py-10 text-center">
               <div className="grid h-16 w-16 place-items-center rounded-full bg-brand-soft text-3xl text-brand">
@@ -119,8 +105,10 @@ export default function LeadForm() {
             </div>
           ) : (
             <form onSubmit={onSubmit} aria-busy={status === "sending"} className="space-y-4">
-              <Field name="name" label="Имя" placeholder="Как к вам обращаться" maxLength={LEAD_LIMITS.name} required />
-              <PhoneField />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field name="name" label="Имя" placeholder="Как к вам обращаться" autoComplete="name" maxLength={LEAD_LIMITS.name} required />
+                <PhoneField />
+              </div>
               <div>
                 <EmailField />
                 <p className="mt-1.5 text-xs text-muted">
@@ -138,7 +126,7 @@ export default function LeadForm() {
                   id="product"
                   name="product"
                   defaultValue=""
-                  className="h-12 w-full rounded-xl border border-black/10 bg-paper px-4 text-sm outline-none transition-colors focus:border-brand"
+                  className="h-12 w-full rounded-xl border border-black/10 bg-paper px-4 text-base outline-none transition-colors focus:border-brand"
                 >
                   <option value="" disabled>Выберите продукт</option>
                   {SERVICES.map((s) => (
@@ -153,7 +141,7 @@ export default function LeadForm() {
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="press w-full rounded-full bg-brand px-6 py-3.5 font-semibold text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+                className="button-primary w-full disabled:opacity-60"
               >
                 {status === "sending" ? "Отправляем…" : "Отправить заявку"}
               </button>
@@ -225,7 +213,7 @@ function PhoneField() {
         onBlur={() => setTouched(true)}
         onInvalid={() => setTouched(true)}
         aria-invalid={showError}
-        className={`h-12 w-full rounded-xl border bg-paper px-4 text-sm outline-none transition-colors placeholder:text-muted/60 ${
+        className={`h-12 w-full rounded-xl border bg-paper px-4 text-base outline-none transition-colors placeholder:text-muted/60 ${
           showError
             ? "border-red-500 focus:border-red-500"
             : "border-black/10 focus:border-brand"
@@ -274,7 +262,7 @@ function EmailField() {
         onBlur={() => setTouched(true)}
         onInvalid={() => setTouched(true)}
         aria-invalid={showError}
-        className={`h-12 w-full rounded-xl border bg-paper px-4 text-sm outline-none transition-colors placeholder:text-muted/60 ${
+        className={`h-12 w-full rounded-xl border bg-paper px-4 text-base outline-none transition-colors placeholder:text-muted/60 ${
           showError
             ? "border-red-500 focus:border-red-500"
             : "border-black/10 focus:border-brand"
@@ -366,7 +354,7 @@ function InnField() {
         onBlur={onBlur}
         onInvalid={() => setTouched(true)}
         aria-invalid={showError}
-        className={`h-12 w-full rounded-xl border bg-paper px-4 text-sm outline-none transition-colors placeholder:text-muted/60 ${
+        className={`h-12 w-full rounded-xl border bg-paper px-4 text-base outline-none transition-colors placeholder:text-muted/60 ${
           showError ? "border-red-500 focus:border-red-500" : "border-black/10 focus:border-brand"
         }`}
       />
@@ -402,7 +390,7 @@ function Field({
       <input
         id={name}
         name={name}
-        className="h-12 w-full rounded-xl border border-black/10 bg-paper px-4 text-sm outline-none transition-colors placeholder:text-muted/60 focus:border-brand"
+        className="h-12 w-full rounded-xl border border-black/10 bg-paper px-4 text-base outline-none transition-colors placeholder:text-muted/60 focus:border-brand"
         {...props}
       />
     </div>

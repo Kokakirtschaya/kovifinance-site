@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { motion } from "motion/react";
 import Reveal from "@/components/site/Reveal";
 import { SHELL } from "@/lib/layout";
 
@@ -143,38 +142,32 @@ export default function Calculator() {
   }, [mode, credit, bg, days, factoring, facDays, leasing]);
 
   return (
-    <section id="calc" className="bg-ink py-20 text-paper md:py-28">
+    <section id="calc" className="section-space bg-ink text-paper">
       <div className={SHELL}>
         <Reveal className="max-w-2xl">
-          <h2 className="text-3xl font-bold tracking-[-0.02em] text-white md:text-5xl">
-            Рассчитайте условия <span className="text-gold-bright">за минуту</span>
+          <h2 className="section-heading text-white">
+            Оцените условия финансирования
           </h2>
-          <p className="mt-4 text-lg text-white/70">
-            Кредит, банковская гарантия, факторинг и лизинг в одном окне. Предварительный расчёт;
-            точные условия подберём под ваш бизнес.
+          <p className="mt-4 text-base leading-relaxed text-white/70">
+            Выберите инструмент и задайте параметры. Точные условия подберём после разбора вашей задачи.
           </p>
         </Reveal>
 
         <Reveal className="mt-10">
-          <div className="rounded-3xl border border-white/10 bg-ink-2 p-5 shadow-2xl md:p-8">
+          <div className="rounded-2xl border border-white/15 bg-ink-2 p-4 sm:p-6 md:p-8">
             {/* Переключатель продукта */}
-            <div className="flex flex-wrap gap-1 rounded-2xl bg-white/5 p-1 sm:inline-flex sm:rounded-full">
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-white/5 p-1 sm:inline-flex">
               {MODES.map((m) => (
                 <button
                   key={m.key}
+                  type="button"
+                  aria-pressed={mode === m.key}
                   onClick={() => setMode(m.key)}
-                  className={`relative rounded-full px-5 py-2 text-sm font-medium transition-colors ${
-                    mode === m.key ? "text-white" : "text-white/60 hover:text-white"
+                  className={`min-h-11 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:px-5 ${
+                    mode === m.key ? "bg-brand text-white" : "text-white/70 hover:text-white"
                   }`}
                 >
-                  {mode === m.key && (
-                    <motion.span
-                      layoutId="calc-tab"
-                      className="absolute inset-0 rounded-full bg-brand"
-                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                    />
-                  )}
-                  <span className="relative z-10">{m.label}</span>
+                  {m.label}
                 </button>
               ))}
             </div>
@@ -372,11 +365,11 @@ export default function Calculator() {
               </div>
 
               {/* Результат */}
-              <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-brand-dark p-6 text-paper">
+              <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-brand-dark p-5 text-paper sm:p-6">
                 <div>
                   <p className="text-sm text-white/60">{result.label}</p>
-                  <p className="mt-2 text-3xl font-semibold tracking-tight text-gold-bright md:text-4xl">
-                    {fmt(result.primary)} <span className="text-xl text-gold-bright/70">₽</span>
+                  <p className="mt-2 text-3xl font-semibold tracking-tight text-[#e0c781] md:text-4xl">
+                    {fmt(result.primary)} <span className="text-xl text-[#d9bd75]">₽</span>
                   </p>
 
                   <dl className="mt-5 space-y-2.5 text-sm">
@@ -388,9 +381,9 @@ export default function Calculator() {
 
                 <a
                   href="#lead"
-                  className="press mt-6 rounded-full bg-brand px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-brand-dark"
+                  className="button-primary mt-6"
                 >
-                  Оставить заявку и получить точный расчёт
+                  Получить точный расчёт
                 </a>
               </div>
             </div>
@@ -407,9 +400,9 @@ export default function Calculator() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between border-t border-white/10 pt-2.5">
+    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-t border-white/15 pt-2.5">
       <dt className="text-white/60">{label}</dt>
-      <dd className="font-medium">{value}</dd>
+      <dd className="ml-auto font-medium tabular-nums">{value}</dd>
     </div>
   );
 }
@@ -441,7 +434,7 @@ function NumberField({
 }) {
   return (
     <label className="block">
-      <span className="text-sm text-white/60">{label}</span>
+      <span className="block text-sm text-white/60">{label}</span>
       <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 pr-2 transition-colors focus-within:border-brand">
         {money ? (
           <input
@@ -449,7 +442,8 @@ function NumberField({
             inputMode="numeric"
             value={fmt(value)}
             onChange={(e) => onChange(Number(e.target.value.replace(/\D/g, "") || 0))}
-            className="w-full bg-transparent px-4 py-2.5 text-sm font-medium text-white outline-none"
+            aria-label={label}
+            className="min-w-0 w-full bg-transparent px-3 py-2.5 text-base font-medium text-white outline-none"
           />
         ) : (
           <input
@@ -459,7 +453,8 @@ function NumberField({
             max={max}
             step={step}
             onChange={(e) => onChange(Number(e.target.value))}
-            className="w-full bg-transparent px-4 py-2.5 text-sm font-medium text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            aria-label={label}
+            className="min-w-0 w-full bg-transparent px-3 py-2.5 text-base font-medium text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
         )}
         {suffix && <span className="whitespace-nowrap text-sm text-white/50">{suffix}</span>}
@@ -470,7 +465,8 @@ function NumberField({
                 key={o.key}
                 type="button"
                 onClick={() => suffixToggle.onChange(o.key)}
-                className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+                aria-pressed={suffixToggle.value === o.key}
+                className={`min-h-9 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
                   suffixToggle.value === o.key ? "bg-white text-ink shadow-sm" : "text-white/50"
                 }`}
               >
@@ -483,6 +479,7 @@ function NumberField({
       {slider && (
         <input
           type="range"
+          aria-label={`${label}, ползунок`}
           min={min}
           max={max}
           step={step}
@@ -508,14 +505,15 @@ function Toggle({
 }) {
   return (
     <div>
-      <span className="text-sm text-white/60">{label}</span>
+      <span className="block text-sm text-white/60">{label}</span>
       <div className="mt-1.5 inline-flex rounded-xl bg-white/10 p-1">
         {options.map((o) => (
           <button
             key={o.key}
             type="button"
             onClick={() => onChange(o.key)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            aria-pressed={value === o.key}
+            className={`min-h-11 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               value === o.key ? "bg-white text-ink shadow-sm" : "text-white/60 hover:text-white"
             }`}
           >

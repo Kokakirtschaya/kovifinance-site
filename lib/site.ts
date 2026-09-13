@@ -16,12 +16,9 @@ export const CONTACTS = {
 
 export const NAV = [
   { label: "Услуги", href: "#services" },
+  { label: "Эксперт", href: "#team" },
+  { label: "Как работаем", href: "#process" },
   { label: "Калькулятор", href: "#calc" },
-  { label: "Клиентам", href: "#process" },
-  { label: "Агентам", href: "#agents" },
-  { label: "CRM", href: "#crm" },
-  { label: "О компании", href: "#team" },
-  { label: "Вопросы", href: "#faq" },
   { label: "Контакты", href: "#contacts" },
 ];
 

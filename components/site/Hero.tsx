@@ -1,74 +1,44 @@
 import Image from "next/image";
 import { SHELL } from "@/lib/layout";
-import MagneticButton from "@/components/site/MagneticButton";
+import SiteIcon from "@/components/site/SiteIcon";
 
 export default function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden bg-ink text-paper">
-      <div className="grain pointer-events-none absolute inset-0 opacity-60" />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(60% 45% at 100% 0%, rgba(30,122,87,0.30) 0%, transparent 70%), radial-gradient(55% 45% at 0% 100%, rgba(212,160,23,0.12) 0%, transparent 70%)",
-        }}
-      />
-
-      <div
-        className={`relative flex flex-col gap-10 py-12 md:py-16 lg:flex-row lg:items-center lg:gap-[4vw] lg:py-[min(6vw,5.5rem)] ${SHELL}`}
-      >
-        <div className="min-w-0 flex-1">
-          <p className="rise mb-4 text-sm font-semibold text-gold-bright lg:text-base">
-            Куём капитал
+    <section id="top" className="overflow-hidden bg-ink text-paper">
+      <div className={`${SHELL} grid gap-9 py-10 sm:py-14 lg:grid-cols-[1.25fr_0.75fr] lg:items-center lg:gap-[7vw] lg:py-16`}>
+        <div>
+          <p className="eyebrow mb-6 flex items-center gap-3 text-white/65">
+            <span className="h-px w-7 shrink-0 bg-gold" aria-hidden />
+            Независимый финансовый советник
           </p>
-          <h1
-            className="rise max-w-[16ch] font-bold leading-[1.06] tracking-[-0.03em] text-[clamp(2.25rem,4.2vw,7.5rem)]"
-            style={{ animationDelay: "0.07s" }}
-          >
-            Финансирование для бизнеса.{" "}
-            <span className="text-gold-bright">Быстро</span> и без бюрократии
+          <h1 className="max-w-[17ch] text-[clamp(2.1rem,4.5vw,5.25rem)] font-semibold leading-[1.06] tracking-[-0.045em]">
+            Финансирование <span className="block">под задачи</span>{" "}<span className="block text-[#bbd7c8]">вашего бизнеса</span>
           </h1>
-          <p
-            className="rise mt-6 max-w-[44ch] leading-relaxed text-white/70 text-[clamp(1.05rem,1.25vw,1.4rem)]"
-            style={{ animationDelay: "0.14s" }}
-          >
-            Подберём кредит, гарантию, факторинг или лизинг. Заявка 5 минут,
-            решение от 3 дней. Оплата за результат.
+          <p className="mt-6 max-w-[43ch] text-base leading-relaxed text-white/70 sm:text-lg">
+            Кредиты, гарантии и другие банковские инструменты. Подбираем банк и ведём сделку до получения денег.
           </p>
-          <div
-            className="rise mt-8 flex flex-col gap-3 sm:flex-row"
-            style={{ animationDelay: "0.21s" }}
-          >
-            <MagneticButton
-              href="#lead"
-              className="rounded-full bg-brand px-7 py-3.5 text-center font-semibold text-white shadow-[0_8px_24px_rgba(30,122,87,0.35)] hover:bg-brand-dark"
-            >
-              Оставить заявку
-            </MagneticButton>
-            <MagneticButton
-              href="#calc"
-              className="rounded-full border border-white/20 px-7 py-3.5 text-center font-semibold text-white hover:bg-white/10"
-            >
-              Рассчитать условия
-            </MagneticButton>
+          <div id="hero-actions" className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <a href="#lead" className="button-primary">Обсудить задачу <SiteIcon name="arrow" className="size-4" /></a>
+            <a href="#calc" className="inline-flex min-h-12 items-center justify-center gap-2 px-3 text-sm font-medium text-white/85 hover:text-white">
+              Рассчитать условия <SiteIcon name="arrow" className="size-4" />
+            </a>
           </div>
+          <p className="mt-5 max-w-[44ch] text-xs leading-relaxed text-white/55 sm:text-sm">
+            Без предоплаты. Вознаграждение — после получения финансирования.
+          </p>
         </div>
-
-        <div className="mx-auto w-full max-w-sm shrink-0 lg:mx-0 lg:max-w-none lg:w-[38%] xl:w-[34%]">
-          <div
-            className="rise relative aspect-[3/4] overflow-hidden rounded-3xl border border-white/10 shadow-[0_24px_60px_rgba(0,0,0,0.35)]"
-            style={{ animationDelay: "0.12s" }}
-          >
-            <Image
-              src="/brand/hero-owner.jpg"
-              alt="Эксперт по финансированию KOVI Finance"
-              fill
-              sizes="(min-width: 1024px) 36vw, 90vw"
-              priority
-              className="object-cover object-[center_28%]"
-            />
+        <figure className="flex items-center gap-4 border-t border-white/15 pt-6 lg:block lg:border-0 lg:pt-0">
+          <div className="relative size-24 shrink-0 overflow-hidden rounded-xl bg-brand-dark sm:size-28 lg:aspect-[4/5] lg:h-auto lg:w-full lg:rounded-2xl">
+            <Image src="/brand/hero-owner.jpg" alt="Кока Кирцхая, основатель KOVI Finance" fill sizes="(min-width: 1024px) 35vw, 112px" priority className="object-cover object-[center_20%]" />
           </div>
-        </div>
+          <figcaption className="lg:mt-5 lg:flex lg:items-start lg:justify-between lg:gap-4">
+            <div>
+              <p className="text-base font-medium text-white">Кока Кирцхая</p>
+              <p className="mt-1 text-xs leading-relaxed text-white/60 sm:text-sm">Основатель KOVI Finance</p>
+            </div>
+            <p className="mt-2 text-xs text-[#d9bd75] sm:text-sm lg:mt-0 lg:max-w-36 lg:text-right">15+ лет в банковском секторе</p>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );

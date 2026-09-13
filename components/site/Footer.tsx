@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { NAV, CONTACTS } from "@/lib/site";
 import { SHELL } from "@/lib/layout";
 import Socials from "@/components/site/Socials";
@@ -5,83 +6,34 @@ import Socials from "@/components/site/Socials";
 export default function Footer() {
   return (
     <footer id="contacts" className="bg-ink text-paper">
-      <div className={`${SHELL} pt-16 pb-28 md:pb-16`}>
-        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
-          <div>
+      <div className={`${SHELL} py-12 md:py-14`}>
+        <div className="grid grid-cols-2 gap-x-5 gap-y-9 md:grid-cols-[1.5fr_1fr_1fr] md:gap-12">
+          <div className="col-span-2 md:col-span-1">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/logo-inverse.svg" alt="KOVI Finance" className="h-9 w-auto" />
-            <p className="mt-4 max-w-sm text-sm text-white/60">
-              Эксперт по финансированию и банковским инструментам для бизнеса.
-              Кредиты, гарантии, факторинг, лизинг и проектное финансирование.
-            </p>
-            <p className="mt-3 max-w-sm text-sm text-white/40">
-              KOVI от славянского «ковать»: мы выковываем финансовые решения.
-            </p>
+            <img src="/brand/logo-inverse.svg" alt="KOVI Finance" className="h-8 w-auto" />
+            <p className="mt-5 text-xl font-medium tracking-tight">Куём капитал</p>
+            <p className="mt-3 max-w-[34ch] text-sm leading-relaxed text-white/60">Соединяем бизнес с банком и доводим сделку до результата.</p>
+            <p className="mt-3 max-w-[38ch] text-xs leading-relaxed text-white/45">KOVI — от славянского «ковать». Выковываем финансовые решения для вашего бизнеса.</p>
           </div>
-
           <div>
-            <h4 className="text-sm font-semibold text-white/45">Навигация</h4>
-            <ul className="mt-4 space-y-2 text-sm">
-              {NAV.map((n) => (
-                <li key={n.href}>
-                  <a href={`/${n.href}`} className="text-white/70 transition-colors hover:text-white">
-                    {n.label}
-                  </a>
-                </li>
-              ))}
-              <li className="pt-2">
-                <a
-                  href="/lk"
-                  className="inline-flex items-center gap-2 text-gold-bright transition-colors hover:text-white"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="8.5" r="3.6" />
-                    <path d="M4.6 20c1.4-3.6 4.1-5.4 7.4-5.4s6 1.8 7.4 5.4" />
-                  </svg>
-                  Личный кабинет
-                </a>
-              </li>
+            <p className="eyebrow text-white/50">Навигация</p>
+            <ul className="mt-3 space-y-0.5 text-sm">
+              {NAV.map(n => <li key={n.href}><a href={`/${n.href}`} className="inline-flex min-h-9 items-center text-white/75 hover:text-white">{n.label}</a></li>)}
+              <li><Link href="/agents" className="inline-flex min-h-9 items-center text-white/75 hover:text-white">Агентам</Link></li>
+              <li><Link href="/crm" className="inline-flex min-h-9 items-center text-white/75 hover:text-white">KOVI CRM</Link></li>
+              <li><Link href="/lk" className="inline-flex min-h-9 items-center text-[#d9bd75] hover:text-white">Личный кабинет</Link></li>
             </ul>
           </div>
-
           <div>
-            <h4 className="text-sm font-semibold text-white/45">Контакты</h4>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li>
-                <a href={CONTACTS.phoneHref} className="text-white/80 hover:text-white">
-                  {CONTACTS.phone}
-                </a>
-              </li>
-              <li>
-                <a href={CONTACTS.emailHref} className="text-white/70 hover:text-white">
-                  {CONTACTS.email}
-                </a>
-              </li>
-            </ul>
+            <p className="eyebrow text-white/50">На связи</p>
+            <a href={CONTACTS.phoneHref} className="mt-4 block whitespace-nowrap text-sm font-medium text-white">{CONTACTS.phone}</a>
+            <a href={CONTACTS.emailHref} className="mt-3 block break-words text-sm text-white/70 hover:text-white">{CONTACTS.email}</a>
             <Socials tone="dark" className="mt-5" />
           </div>
         </div>
-
-        <div className="mt-14 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/40 md:flex-row md:items-center md:justify-between">
+        <div className="mt-9 grid gap-3 border-t border-white/15 pt-5 text-xs leading-relaxed text-white/55 lg:grid-cols-2">
           <p>© {new Date().getFullYear()} {CONTACTS.legalName}. Все права защищены.</p>
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <a href="/confidentiality" className="transition-colors hover:text-white">
-              Политика конфиденциальности
-            </a>
-            <span className="hidden text-white/20 md:inline" aria-hidden>
-              ·
-            </span>
-            <span>Информация на сайте не является публичной офертой.</span>
-          </p>
+          <div className="flex flex-wrap gap-x-5 gap-y-2 lg:justify-end"><Link href="/confidentiality" className="underline-offset-2 hover:underline hover:text-white">Политика конфиденциальности</Link><p>Информация не является публичной офертой.</p></div>
         </div>
       </div>
     </footer>

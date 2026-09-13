@@ -11,7 +11,8 @@ export function useActiveSection(): string {
     const ids = NAV.map((n) => n.href.replace("#", "")).filter(Boolean);
     const sections = ids
       .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
+      .filter((el): el is HTMLElement => el !== null)
+      .sort((a, b) => a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
     if (!sections.length) return;
 
     const update = () => {
