@@ -16,6 +16,7 @@ export const CONTACTS = {
 
 export const NAV = [
   { label: "Услуги", href: "#services" },
+  { label: "Кейсы", href: "#cases" },
   { label: "Эксперт", href: "#team" },
   { label: "Как работаем", href: "#process" },
   { label: "Калькулятор", href: "#calc" },

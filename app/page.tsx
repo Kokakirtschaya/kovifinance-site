@@ -2,7 +2,7 @@ import Header from "@/components/site/Header";
 import Hero from "@/components/site/Hero";
 import TrustBar from "@/components/site/TrustBar";
 import Services from "@/components/site/Services";
-import BusinessTasks from "@/components/site/BusinessTasks";
+import CaseStudies from "@/components/site/CaseStudies";
 import Calculator from "@/components/site/Calculator";
 import Process from "@/components/site/Process";
 import MoreWays from "@/components/site/MoreWays";
@@ -44,7 +44,7 @@ export default async function Home() {
         <Hero />
         <TrustBar />
         <Services />
-        <BusinessTasks />
+        <CaseStudies />
         <Team />
         <Process />
         <Calculator />
