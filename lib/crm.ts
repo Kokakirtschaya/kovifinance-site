@@ -40,9 +40,18 @@ export type LeadInput = {
   source?: string; // с какой страницы
 };
 
-// Отправка заявки в CRM (создаёт сделку). Не критично: если CRM недоступна,
-// заявка всё равно уходит в Telegram — вызывающий не должен падать.
-export async function createLead(lead: LeadInput): Promise<{ ok: boolean }> {
+export type LeadResult =
+  | { ok: true; dealId?: string; companyId?: string }
+  | { ok: false };
+
+/** В ссылку уведомления допускаются только непрозрачные идентификаторы CRM. */
+export function crmRecordId(value: unknown): string | undefined {
+  return typeof value === "string" && /^[a-z0-9_-]{1,128}$/i.test(value) ? value : undefined;
+}
+
+// Успех означает подтверждённое сохранение сделки в CRM. Telegram содержит
+// только уведомление и больше не служит запасным хранилищем контактов.
+export async function createLead(lead: LeadInput): Promise<LeadResult> {
   const base = crmApiBase();
   const token = process.env.CRM_API_TOKEN;
   if (!base || !token) return { ok: false };
@@ -56,8 +65,13 @@ export async function createLead(lead: LeadInput): Promise<{ ok: boolean }> {
     });
     if (!res.ok) return { ok: false };
     const data: unknown = await res.json();
+    if (!data || typeof data !== "object" || !("ok" in data) || data.ok !== true) {
+      return { ok: false };
+    }
     return {
-      ok: !!data && typeof data === "object" && "ok" in data && data.ok === true,
+      ok: true,
+      dealId: "dealId" in data ? crmRecordId(data.dealId) : undefined,
+      companyId: "companyId" in data ? crmRecordId(data.companyId) : undefined,
     };
   } catch {
     return { ok: false };

@@ -38,7 +38,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "inn_not_found" }, { status: 422 });
   }
   const company = innCheck.status === "found" ? innCheck.name : "";
-  const innNotInRegistry = innCheck.status === "not_found";
 
   // Заголовок заявки: продукт с главной, либо тип объекта/залога с посадочных
   const title =
@@ -50,38 +49,26 @@ export async function POST(request: Request) {
   const amount = body.price || body.sum;
   const source = body.source;
 
-  const lead = { name, phone, email, inn: innRaw, company, title, amount, source };
-
   // 1) В CRM — создаёт сделку (клиент увидит её в ЛК, если указал e-mail)
   const crm = await createLead({
     name,
     phone,
     email: email || undefined,
-    inn: lead.inn || undefined,
+    inn: innRaw || undefined,
     company: company || undefined,
     title,
     amount: amount || undefined,
     source: source || undefined,
   });
 
-  // 2) В Telegram — быстрое уведомление менеджеру (дублирует, не заменяет CRM).
-  // Идёт релеем через сервер CRM: напрямую из контейнера Telegram недостижим —
-  // подробности в lib/notify.ts.
-  const text =
-    `🟢 Новая заявка с сайта${source ? ` (${source})` : ""}\n\n` +
-    `👤 ${name}\n📞 ${phone}\n` +
-    (email ? `✉️ ${email}\n` : "") +
-    (lead.inn
-      ? `🏢 ИНН: ${lead.inn}` +
-        (company ? ` — ${company}` : innNotInRegistry ? " — ⚠️ в реестре не найден" : "") +
-        "\n"
-      : "") +
-    `💼 ${title}` +
-    (amount ? `\n💰 ${amount}` : "") +
-    `\n\n${crm.ok ? "✅ в CRM" : "⚠️ CRM не подтвердила приём — проверить и при необходимости занести вручную"}` +
-    `\nНомер обращения: ${requestId}`;
-
-  const notified = await notifyTelegram(text, requestId);
+  // 2) В Telegram передаём только технический номер и идентификаторы CRM.
+  // Данные заявки отправляются только в CRM.
+  const notified = await notifyTelegram({
+    requestId,
+    savedToCrm: crm.ok,
+    dealId: crm.ok ? crm.dealId : undefined,
+    companyId: crm.ok ? crm.companyId : undefined,
+  });
 
   // Только технический результат: контакты и произвольные поля в логи не попадают.
   console.log(
@@ -89,13 +76,14 @@ export async function POST(request: Request) {
     JSON.stringify({
       requestId,
       crm: crm.ok,
+      dealId: crm.ok ? crm.dealId : undefined,
       tg: notified.ok,
     }),
   );
 
-  // Успех означает подтверждённое сохранение в CRM или доставку менеджеру.
-  // Если оба канала не подтвердили приём, форма сохраняет данные для повтора.
-  if (!crm.ok && !notified.ok) {
+  // Уведомление без контактов не заменяет сохранённую заявку. Если CRM
+  // не подтвердила приём, форма сохраняет данные и предлагает повторить отправку.
+  if (!crm.ok) {
     return NextResponse.json(
       { ok: false, error: "delivery_failed", requestId },
       { status: 503 },

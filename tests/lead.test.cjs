@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- Node tests in this project use CommonJS. */
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -15,10 +16,10 @@ function load(file, deps = {}, globals = {}) {
   const code = ts.transpileModule(fs.readFileSync(path.join(root, file), "utf8"), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;
-  const module = { exports: {} };
+  const loaded = { exports: {} };
   vm.runInNewContext(code, {
-    module,
-    exports: module.exports,
+    module: loaded,
+    exports: loaded.exports,
     require(id) {
       assert.ok(Object.hasOwn(deps, id), `Unexpected dependency: ${id}`);
       return deps[id];
@@ -30,7 +31,7 @@ function load(file, deps = {}, globals = {}) {
     fetch() { throw new Error("Network is disabled in lead tests"); },
     ...globals,
   }, { filename: file });
-  return module.exports;
+  return loaded.exports;
 }
 
 const inn = load("lib/inn.ts");
@@ -39,6 +40,14 @@ const validation = load("lib/lead-validation.ts", {
   "@/lib/inn": inn,
   "@/lib/site": site,
 });
+const crmTools = load("lib/crm.ts");
+const notificationTools = load("lib/notify.ts", { "@/lib/crm": crmTools });
+const crmIds = { dealId: "cm000000000000000000000001", companyId: "cm000000000000000000000002" };
+const notice = {
+  requestId: "00000000-0000-4000-8000-000000000001",
+  savedToCrm: true,
+  ...crmIds,
+};
 const fixture = {
   name: "Тестовая заявка",
   phone: "+7 (999) 000-00-00",
@@ -57,16 +66,23 @@ function leadRequest(body, raw = false) {
 }
 
 function handler({ crmOk = true, tgOk = true, lookup = { status: "unconfigured" }, allowed = true } = {}) {
-  const calls = { crm: [], tg: [], lookup: [], logs: [] };
+  const calls = { crm: [], tg: [], tgText: [], lookup: [], logs: [] };
   const { POST } = load("app/api/lead/route.ts", {
     "next/server": { NextResponse },
     "node:crypto": { randomUUID },
     "@/lib/lead-validation": validation,
     "@/lib/crm": {
-      createLead: async (body) => { calls.crm.push(body); return { ok: crmOk }; },
+      createLead: async (body) => {
+        calls.crm.push(body);
+        return crmOk ? { ok: true, ...crmIds } : { ok: false };
+      },
     },
     "@/lib/notify": {
-      notifyTelegram: async (...args) => { calls.tg.push(args); return { ok: tgOk }; },
+      notifyTelegram: async (notification) => {
+        calls.tg.push(notification);
+        calls.tgText.push(notificationTools.formatLeadNotification(notification));
+        return { ok: tgOk };
+      },
     },
     "@/lib/checko": {
       lookupInn: async (value) => { calls.lookup.push(value); return lookup; },
@@ -118,7 +134,8 @@ test("lead is rejected without explicit personal-data consent", async () => {
     assert.equal(validation.validateLead({ ...fixture, pdConsent }).ok, true);
   }
   const { POST, calls } = handler();
-  const { pdConsent: _ignored, ...withoutConsent } = fixture;
+  const withoutConsent = { ...fixture };
+  delete withoutConsent.pdConsent;
   const response = await POST(leadRequest(withoutConsent));
   assert.equal(response.status, 422);
   assert.equal((await response.json()).error, "consent");
@@ -153,14 +170,15 @@ for (const crmOk of [false, true]) {
       const { POST, calls } = handler({ crmOk, tgOk });
       const response = await POST(leadRequest(fixture));
       const body = await response.json();
-      assert.equal(response.status, crmOk || tgOk ? 200 : 503);
-      assert.equal(body.ok, crmOk || tgOk);
+      assert.equal(response.status, crmOk ? 200 : 503);
+      assert.equal(body.ok, crmOk);
       if (!body.ok) assert.equal(body.error, "delivery_failed");
       assert.match(body.requestId, /^[\da-f-]{36}$/);
       assert.equal(calls.crm.length, 1);
       assert.equal(calls.tg.length, 1);
-      assert.equal(calls.tg[0][1], body.requestId);
-      assert.ok(calls.tg[0][0].includes(body.requestId));
+      assert.equal(calls.tg[0].requestId, body.requestId);
+      assert.equal(calls.tg[0].savedToCrm, crmOk);
+      assert.ok(calls.tgText[0].includes(crmOk ? crmIds.dealId : body.requestId));
       assert.equal(calls.crm[0].phone, "+79990000000");
       const log = calls.logs.join("\n");
       for (const contact of [fixture.name, fixture.phone, fixture.email, fixture.inn]) {
@@ -182,6 +200,28 @@ test("a Checko outage does not block a valid lead, but an absent organization do
   assert.equal(calls.crm.length + calls.tg.length, 0);
 });
 
+for (const crmOk of [true, false]) {
+  test(`only technical metadata reaches Telegram when CRM=${crmOk}`, async () => {
+    const company = "PRIVATE-COMPANY-NAME";
+    const amount = "345678901";
+    const source = "private-campaign-tag";
+    const { POST, calls } = handler({ crmOk, lookup: { status: "found", name: company } });
+    await POST(leadRequest({ ...fixture, price: amount, source }));
+    assert.equal(calls.crm[0].company, company);
+    assert.equal(calls.crm[0].amount, amount);
+    assert.equal(calls.crm[0].source, source);
+    const outgoing = JSON.stringify({ notices: calls.tg, text: calls.tgText, logs: calls.logs });
+    for (const value of [fixture.name, fixture.phone, "+79990000000", fixture.email, fixture.inn, fixture.product, company, amount, source]) {
+      assert.ok(!outgoing.includes(value), `Private lead field leaked: ${value}`);
+    }
+    const target = crmOk
+      ? `${crmTools.CRM_PUBLIC_URL}/companies/${crmIds.companyId}`
+      : `${crmTools.CRM_PUBLIC_URL}/deals`;
+    assert.ok(calls.tgText[0].includes(target));
+    if (!crmOk) assert.ok(calls.tgText[0].includes("Пользователю предложено повторить отправку"));
+  });
+}
+
 test("legacy landing fields still reach CRM", async () => {
   const { POST, calls } = handler();
   await POST(leadRequest({ ...fixture, product: "", property: "Офис", sum: 50000000, source: "landing" }));
@@ -200,6 +240,35 @@ test("CRM requires explicit JSON confirmation, not just HTTP 200", async () => {
     });
     assert.equal((await crm.createLead(fixture)).ok, reply?.ok === true);
   }
+});
+
+test("CRM keeps only safe record IDs for notification links", async () => {
+  for (const ids of [crmIds, {}, { dealId: fixture.email, companyId: "../../api/export?token=secret" }, { dealId: {}, companyId: 42 }]) {
+    const crm = load("lib/crm.ts", {}, {
+      process: { env: crmEnv },
+      fetch: async () => Response.json({ ok: true, ...ids, name: fixture.name, email: fixture.email, url: "https://evil.example.invalid" }),
+    });
+    const result = await crm.createLead(fixture);
+    assert.equal(result.ok, true);
+    assert.equal(result.dealId, ids === crmIds ? crmIds.dealId : undefined);
+    assert.equal(result.companyId, ids === crmIds ? crmIds.companyId : undefined);
+    assert.equal(result.name, undefined);
+    assert.equal(result.email, undefined);
+    assert.equal(result.url, undefined);
+  }
+});
+
+test("notification rejects arbitrary text and does not echo untrusted IDs or extra fields", () => {
+  for (const value of [null, fixture.email, { ...notice, requestId: fixture.email }, { ...notice, savedToCrm: "yes" }]) {
+    assert.equal(notificationTools.formatLeadNotification(value), undefined);
+  }
+  const text = notificationTools.formatLeadNotification({
+    ...notice, dealId: fixture.email, companyId: "../../api/export?token=secret", ...fixture,
+  });
+  assert.ok(text.includes(notice.requestId));
+  assert.ok(text.includes(`${crmTools.CRM_PUBLIC_URL}/deals`));
+  for (const value of [fixture.name, fixture.email, fixture.phone, fixture.inn, "api/export", "secret"])
+    assert.ok(!text.includes(value));
 });
 
 // Сокращаем только время теста. fetch ждёт реального сигнала отмены.
@@ -230,11 +299,11 @@ test("stalled CRM, Checko and Telegram requests terminate with a handled failure
       process: { env: { CHECKO_API_KEY: "synthetic-token", CHECKO_BASE_URL: "https://checko.example.invalid" } },
     });
     assert.equal((await checko.lookupInn(fixture.inn)).status, "error");
-    const notify = load("lib/notify.ts", { "@/lib/crm": { crmApiBase: () => crmEnv.CRM_API_URL } }, {
+    const notify = load("lib/notify.ts", { "@/lib/crm": { ...crmTools, crmApiBase: () => crmEnv.CRM_API_URL } }, {
       ...network.globals,
       process: { env: { ...crmEnv, TELEGRAM_BOT_TOKEN: "synthetic-token", TELEGRAM_CHAT_ID: "0" } },
     });
-    assert.equal((await notify.notifyTelegram("Synthetic message")).ok, false);
+    assert.equal((await notify.notifyTelegram(notice)).ok, false);
     assert.deepEqual(network.deadlines, [8000, 8000, 4000, 9000, 5000]);
   } finally {
     clearInterval(keepAlive);
@@ -245,24 +314,47 @@ test("Telegram falls back to direct delivery and does not log contacts or error 
   const calls = [];
   const logs = [];
   let directOk = true;
-  const notify = load("lib/notify.ts", { "@/lib/crm": { crmApiBase: () => crmEnv.CRM_API_URL } }, {
+  const notify = load("lib/notify.ts", { "@/lib/crm": { ...crmTools, crmApiBase: () => crmEnv.CRM_API_URL } }, {
     process: { env: { ...crmEnv, TELEGRAM_BOT_TOKEN: "synthetic-token", TELEGRAM_CHAT_ID: "0" } },
     console: { warn: (...args) => logs.push(args.join(" ")), error: (...args) => logs.push(args.join(" ")) },
-    fetch: async (url) => {
-      calls.push(url);
+    fetch: async (url, options) => {
+      calls.push({ url, body: JSON.parse(options.body) });
       if (url.includes("/api/public/notify")) return Response.json({ ok: false });
       if (!directOk) throw new Error("sensitive-error-details");
       return Response.json({ ok: true });
     },
   });
-  const result = await notify.notifyTelegram(fixture.email, "test-request");
+  const result = await notify.notifyTelegram({ ...notice, ...fixture });
   assert.equal(result.ok, true);
   assert.equal(result.via, "direct");
   assert.equal(calls.length, 2);
+  assert.equal(calls[0].body.text, notificationTools.formatLeadNotification(notice));
+  assert.equal(calls[1].body.text, calls[0].body.text);
+  for (const value of [fixture.name, fixture.email, fixture.phone, fixture.inn, fixture.product])
+    assert.ok(!JSON.stringify(calls.map((call) => call.body)).includes(value));
   directOk = false;
-  assert.equal((await notify.notifyTelegram(fixture.email, "failed-request")).ok, false);
-  assert.ok(logs.join("\n").includes("failed-request"));
+  assert.equal((await notify.notifyTelegram(notice)).ok, false);
+  assert.ok(logs.join("\n").includes(notice.requestId));
   for (const sensitive of [fixture.email, "synthetic-token", "sensitive-error-details"]) {
     assert.ok(!logs.join("\n").includes(sensitive));
   }
+});
+
+test("malformed notification makes no network requests", async () => {
+  const notify = load("lib/notify.ts", { "@/lib/crm": crmTools });
+  assert.equal((await notify.notifyTelegram(fixture.email)).reason, "invalid_notification");
+});
+
+test("confirmed relay delivery does not duplicate the notification through the bot", async () => {
+  const calls = [];
+  const notify = load("lib/notify.ts", { "@/lib/crm": { ...crmTools, crmApiBase: () => crmEnv.CRM_API_URL } }, {
+    process: { env: { ...crmEnv, TELEGRAM_BOT_TOKEN: "synthetic-token", TELEGRAM_CHAT_ID: "0" } },
+    fetch: async (url, options) => {
+      calls.push({ url, body: JSON.parse(options.body) });
+      return Response.json({ ok: true });
+    },
+  });
+  assert.equal((await notify.notifyTelegram(notice)).via, "relay");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].body.text, notificationTools.formatLeadNotification(notice));
 });
