@@ -12,7 +12,7 @@ export default function CaseStudies() {
           <h2 className="section-heading max-w-[25ch]">Как решались задачи клиентов</h2>
         </div>
         <Link href="/cases" className="text-link shrink-0">
-          Все {CASE_STUDIES.length} кейсов <SiteIcon name="arrow" className="size-4" />
+          Больше кейсов <SiteIcon name="arrow" className="size-4" />
         </Link>
       </div>
 

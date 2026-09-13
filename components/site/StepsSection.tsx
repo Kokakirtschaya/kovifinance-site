@@ -1,36 +1,102 @@
 import type { ReactNode } from "react";
 import type { Step } from "@/lib/site";
 import { SHELL } from "@/lib/layout";
-import SiteIcon, { type SiteIconName } from "@/components/site/SiteIcon";
+import Reveal from "@/components/site/Reveal";
+import AdvantageIcon, { type AdvantageIconName } from "@/components/site/AdvantageIcon";
+import CardChevrons from "@/components/site/CardChevrons";
 
-export type Advantage = { title: string; desc: string; icon: SiteIconName };
+/** decor.box — доля от карточки, а не пиксели: карточка резиновая, и жёсткий размер
+    на узком экране заполнял её целиком. Потолок по высоте не даёт картинке вылезти
+    за карточку, object-contain держит пропорции файла. */
+export type Advantage = {
+  title: string;
+  desc: string;
+  icon: AdvantageIconName;
+  decor?: { src: string; box: string };
+};
 
-export default function StepsSection({ id, title, subtitle, steps, advantages, className = "" }: {
-  id: string; title: ReactNode; subtitle: string; steps: Step[]; advantages: Advantage[]; className?: string;
+/** Общая разметка для блоков «Клиентам» и «Агентам»: слева шаги, справа карточки.
+    Тексты приходят пропсами — правятся в данных, а не в вёрстке. */
+export default function StepsSection({
+  id,
+  title,
+  subtitle,
+  steps,
+  advantages,
+  className = "",
+}: {
+  id: string;
+  title: ReactNode;
+  subtitle: string;
+  steps: Step[];
+  advantages: Advantage[];
+  className?: string;
 }) {
   return (
     <section id={id} className={className}>
-      <div className={`${SHELL} section-space`}>
-        <div className="grid gap-5 lg:grid-cols-2 lg:items-end lg:gap-16">
-          <h2 className="section-heading max-w-[23ch]">{title}</h2>
-          <p className="max-w-[52ch] text-base leading-relaxed text-muted">{subtitle}</p>
-        </div>
-        <ol className={`mt-9 grid gap-7 sm:grid-cols-2 lg:mt-12 ${steps.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-2"}`}>
-          {steps.map(s => (
-            <li key={s.n} className="border-t border-brand/25 pt-5">
-              <span className="text-sm font-medium tabular-nums text-brand">{s.n}</span>
-              <h3 className="mt-4 text-lg font-semibold tracking-tight">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{s.desc}</p>
-            </li>
-          ))}
-        </ol>
-        <div className={`mt-10 grid gap-6 rounded-2xl bg-brand-soft/55 p-6 sm:grid-cols-2 lg:mt-12 lg:p-8 ${advantages.length === 4 ? "xl:grid-cols-4" : ""}`}>
-          {advantages.map(a => (
-            <div key={a.title} className="flex items-start gap-3">
-              <SiteIcon name={a.icon} className="mt-0.5 size-5 shrink-0 text-brand" />
-              <div><h3 className="text-sm font-semibold">{a.title}</h3><p className="mt-1.5 text-sm leading-relaxed text-muted">{a.desc}</p></div>
-            </div>
-          ))}
+      <div className={`${SHELL} py-20 md:py-28`}>
+        <div className="grid gap-14 lg:grid-cols-2">
+          <Reveal>
+            <h2 className="text-3xl font-bold tracking-[-0.02em] md:text-5xl">{title}</h2>
+            <p className="mt-4 text-lg text-muted">{subtitle}</p>
+
+            <ol className="mt-10">
+              {steps.map((s, i) => {
+                const last = i === steps.length - 1;
+                return (
+                  <li key={s.n} className="relative flex gap-4 pb-8 last:pb-0 sm:gap-5">
+                    {!last && (
+                      <span
+                        aria-hidden
+                        className="absolute left-[21px] top-12 bottom-0 w-0.5 rounded-full bg-gradient-to-b from-brand/50 to-gold/40"
+                      />
+                    )}
+                    <span
+                      className={`relative z-[1] grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-sm font-bold tabular-nums shadow-[0_6px_16px_rgba(30,122,87,0.16)] ${
+                        last
+                          ? "bg-brand text-white"
+                          : "bg-brand-soft text-brand-dark ring-1 ring-brand/20"
+                      }`}
+                    >
+                      {s.n}
+                    </span>
+                    <div className="min-w-0 pt-1.5">
+                      <h3 className="font-semibold tracking-tight">{s.title}</h3>
+                      <p className="mt-1 text-sm leading-relaxed text-muted">{s.desc}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </Reveal>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            {advantages.map((a, i) => (
+              <Reveal key={a.title} delay={i * 0.06} className="h-full">
+                <div className="group relative h-full min-h-[280px] overflow-hidden rounded-2xl bg-brand-dark p-6 shadow-[var(--shadow-soft)] transition-shadow duration-300 hover:shadow-[var(--shadow-lift)]">
+                  {!a.decor && <CardChevrons />}
+                  <div className="relative">
+                    <div className="mb-4 grid h-10 w-10 place-items-center rounded-lg bg-white/10">
+                      <AdvantageIcon name={a.icon} />
+                    </div>
+                    <h3 className="font-semibold tracking-tight text-white">{a.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-white/70">{a.desc}</p>
+                  </div>
+                  {a.decor && (
+                    /* SVG сохраняет собственную анимацию. Отдельное место под
+                       рисунок не даёт ему перекрывать текст карточки. */
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={a.decor.src}
+                      alt=""
+                      aria-hidden
+                      className={`pointer-events-none mx-auto mt-5 h-40 object-contain opacity-70 ${a.decor.box}`}
+                    />
+                  )}
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -5,6 +5,7 @@ import Services from "@/components/site/Services";
 import CaseStudies from "@/components/site/CaseStudies";
 import Calculator from "@/components/site/Calculator";
 import Process from "@/components/site/Process";
+import Agents from "@/components/site/Agents";
 import MoreWays from "@/components/site/MoreWays";
 import Team from "@/components/site/Team";
 import FAQ from "@/components/site/FAQ";
@@ -47,6 +48,7 @@ export default async function Home() {
         <CaseStudies />
         <Team />
         <Process />
+        <Agents />
         <Calculator />
         <MoreWays />
         <FAQ />
