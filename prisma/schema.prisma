@@ -63,3 +63,13 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+// Общие для всех процессов счётчики выдачи ссылок входа. key — HMAC,
+// исходный адрес электронной почты или IP здесь не хранится.
+model AuthRateLimit {
+  key       String   @id
+  count     Int
+  expiresAt DateTime @db.Timestamptz(3)
+
+  @@index([expiresAt])
+}

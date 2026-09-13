@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:lead": "node --test tests/*.test.cjs"
+    "test:lead": "node --test tests/*.test.cjs",
+    "test:auth": "node --test tests/auth*.test.cjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

@@ -2,7 +2,9 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { Provider } from "next-auth/providers";
 import nodemailer from "nodemailer";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { allowMagicLink } from "@/lib/auth-rate-limit";
 
 // Письмо со ссылкой для входа. Бренд KOVI: тёмный герой, жёлтая кнопка-акцент.
 function loginEmailHtml(url: string): string {
@@ -137,8 +139,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [magicLink],
   session: { strategy: "database" }, // магик-линк требует сессий в БД
+  callbacks: {
+    async signIn({ user, email }) {
+      // Auth.js вызывает этот хук ДО создания токена и отправки письма:
+      // и из Server Action, и из /api/auth/signin/email. Проверка только
+      // в форме оставляла второй путь без ограничений.
+      // Открытие уже выданной ссылки не расходует лимит отправки.
+      if (!email?.verificationRequest) return true;
+
+      try {
+        const allowed = await allowMagicLink(user.email ?? "", await headers());
+        return allowed ? true : "/lk?error=rate_limit";
+      } catch {
+        console.error("AUTH_RATE_LIMIT_UNAVAILABLE");
+        return "/lk?error=unavailable";
+      }
+    },
+  },
   pages: {
     signIn: "/lk",
     verifyRequest: "/lk?sent=1",
+    error: "/lk",
   },
 });

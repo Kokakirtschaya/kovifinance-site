@@ -4,6 +4,7 @@ import LoginForm from "@/app/lk/login-form";
 import { requestMagicLink } from "@/app/lk/actions";
 import { getApplications, type Application } from "@/lib/crm";
 import { CONTACTS } from "@/lib/site";
+import { loginErrorMessage } from "@/lib/auth-messages";
 
 const fmt = (n: string) => new Intl.NumberFormat("ru-RU").format(Number(n));
 const STEPS = ["Заявка принята", "В работе", "Подано в банк", "Решение банка"];
@@ -14,10 +15,11 @@ export const metadata = { title: "Личный кабинет — KOVI Finance" 
 export default async function CabinetPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sent?: string }>;
+  searchParams: Promise<{ sent?: string; error?: string }>;
 }) {
   const session = await auth();
-  const { sent } = await searchParams;
+  const { sent, error } = await searchParams;
+  const loginError = loginErrorMessage(error);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -50,7 +52,7 @@ export default async function CabinetPage({
         ) : (
           <div className="mx-auto flex max-w-md flex-col justify-center px-5 py-20">
             <div className="rounded-3xl border border-black/[0.07] bg-white p-8 shadow-[var(--shadow-soft)]">
-              {sent ? (
+              {sent && !loginError ? (
                 <div className="text-center">
                   <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand-soft text-2xl text-brand">
                     ✉
@@ -81,6 +83,9 @@ export default async function CabinetPage({
                     Введите e-mail, с которого оставляли заявку. Пришлём ссылку для входа —
                     пароль не нужен.
                   </p>
+                  {loginError ? (
+                    <p role="alert" className="mt-4 text-sm text-red-600">{loginError}</p>
+                  ) : null}
                   <LoginForm action={requestMagicLink} />
                   <p className="mt-4 text-xs text-muted">
                     Ещё не оставляли заявку?{" "}
