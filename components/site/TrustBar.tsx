@@ -7,7 +7,7 @@ export default function TrustBar() {
       <ul className={`${SHELL} grid gap-4 py-6 text-sm text-ink/80 sm:grid-cols-3 sm:gap-6 sm:py-7`}>
         {[
           ["banks", "Подбираем банк под вашу задачу"],
-          ["manager", "Работаем напрямую с основателем"],
+          ["manager", "Работаем профессионально"],
           ["result", "Получаем оплату за результат"],
         ].map(([icon, label]) => (
           <li key={icon} className="flex items-center gap-3"><SiteIcon name={icon} className="size-5 shrink-0 text-brand" />{label}</li>
