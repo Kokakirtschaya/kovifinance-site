@@ -12,17 +12,25 @@ export function generateStaticParams() {
 export const dynamicParams = false;
 
 export async function generateMetadata({ params }: PageProps<"/v/[slug]">): Promise<Metadata> {
-  const card = VCARDS[(await params).slug];
+  const { slug } = await params;
+  const card = VCARDS[slug];
   if (!card) return {};
+  // absolute: без шаблона «· KOVIFINANCE» — у визиток без бренда его быть не должно.
+  // openGraph/twitter/keywords переопределяем целиком: корневые описывают сайт KOVI.
+  const title = card.branded ? `${fullName(card)} · KOVIFINANCE` : fullName(card);
+  const description = `Контакты: ${[fullName(card), card.organization].filter(Boolean).join(", ")}.`;
   return {
-    title: `${fullName(card)} — визитка`,
-    description: `Контакты: ${fullName(card)}, ${card.organization ?? "KOVIFinance"}.`,
+    title: { absolute: title },
+    description,
+    keywords: [],
+    openGraph: { type: "profile", title, description, url: `/v/${slug}`, siteName: card.branded ? "KOVIFINANCE" : undefined },
+    twitter: { card: "summary_large_image", title, description },
     robots: { index: false, follow: false },
   };
 }
 
 const row =
-  "flex min-h-14 items-center justify-between gap-4 rounded-xl bg-white px-5 shadow-soft transition-colors hover:bg-brand-soft";
+  "flex min-h-14 items-center justify-between gap-4 rounded-xl bg-white px-5 shadow-soft transition-colors hover:bg-paper";
 
 export default async function VCardPage({ params }: PageProps<"/v/[slug]">) {
   const { slug } = await params;
@@ -32,9 +40,13 @@ export default async function VCardPage({ params }: PageProps<"/v/[slug]">) {
   return (
     <main className="flex-1 bg-paper-2">
       <div className="mx-auto max-w-md px-4 pb-12">
-        <div className="-mx-4 bg-brand-dark px-4 pb-20 pt-6">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo-inverse.svg" alt="KOVI Finance" className="h-7 w-auto" />
+        <div className={`-mx-4 px-4 pb-20 pt-6 ${card.branded ? "bg-brand-dark" : "bg-ink-2"}`}>
+          {card.branded ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src="/brand/logo-inverse.svg" alt="KOVI Finance" className="h-7 w-auto" />
+          ) : (
+            <div className="h-7" />
+          )}
         </div>
 
         <div className="-mt-16 flex flex-col items-center text-center">
@@ -51,7 +63,10 @@ export default async function VCardPage({ params }: PageProps<"/v/[slug]">) {
           {card.organization && <p className="mt-1 text-sm text-muted">{card.organization}</p>}
         </div>
 
-        <a href={`/v/${slug}/contact.vcf`} className="button-primary mt-7 w-full">
+        <a
+          href={`/v/${slug}/contact.vcf`}
+          className={`button-primary mt-7 w-full ${card.branded ? "" : "bg-ink hover:bg-ink-2"}`}
+        >
           Сохранить контакт
         </a>
 
@@ -77,14 +92,18 @@ export default async function VCardPage({ params }: PageProps<"/v/[slug]">) {
         </div>
 
         {card.links.length > 0 && (
-          <div className="mt-6 grid grid-cols-3 gap-2.5">
+          <div className={`mt-6 grid gap-2.5 ${["", "grid-cols-1", "grid-cols-2"][card.links.length] ?? "grid-cols-3"}`}>
             {card.links.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex min-h-12 items-center justify-center rounded-xl border border-brand/30 px-2 text-sm font-medium text-brand-dark transition-colors hover:bg-brand-soft"
+                className={`flex min-h-12 items-center justify-center rounded-xl border px-2 text-sm font-medium transition-colors ${
+                  card.branded
+                    ? "border-brand/30 text-brand-dark hover:bg-brand-soft"
+                    : "border-ink/20 text-ink hover:bg-white"
+                }`}
               >
                 {l.label}
               </a>

@@ -1,5 +1,6 @@
 import { CONTACTS } from "@/lib/site";
 import { PHOTO as KOKA_PHOTO } from "@/lib/vcard-photos/koka";
+import { PHOTO as ARNOLD_PHOTO } from "@/lib/vcard-photos/arnold";
 
 // Цифровые визитки /v/<slug>: QR на печатной визитке ведёт на страницу,
 // кнопка «Сохранить контакт» отдаёт .vcf с фото. Фото в сам QR не помещается.
@@ -18,6 +19,7 @@ export type VCard = {
   links: Link[];
   photoUrl: string; // для страницы
   photoBase64: string; // JPEG для .vcf
+  branded: boolean; // false — визитка не сотрудника KOVI: без логотипа и упоминаний бренда
 };
 
 export const VCARDS: Record<string, VCard> = {
@@ -38,6 +40,17 @@ export const VCARDS: Record<string, VCard> = {
     ],
     photoUrl: "/vcard/koka.jpg",
     photoBase64: KOKA_PHOTO,
+    branded: true,
+  },
+  arnold: {
+    givenName: "Арнольд",
+    familyName: "Хачатурян",
+    phones: [{ label: "Телефон", value: "+79266681991", type: "CELL" }],
+    email: "info@kcax.ru",
+    links: [{ label: "Telegram", href: "https://t.me/kcarnoldaxa" }],
+    photoUrl: "/vcard/arnold.jpg",
+    photoBase64: ARNOLD_PHOTO,
+    branded: false,
   },
 };
 
