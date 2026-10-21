@@ -24,7 +24,7 @@ export const config = {
   matcher: [
     // Страницы, 404 и переходы RSC, включая prefetch. Исключаем только API
     // и каталоги/файлы ресурсов; HTML-ответы Auth.js покрываем отдельно.
-    "/((?!api/|_next/|brand/|crm/|decor/|mood/|team/|favicon\\.ico$|icon\\.png$|apple-icon\\.png$|opengraph-image$|robots\\.txt$|sitemap\\.xml$).*)",
+    "/((?!api/|_next/|brand/|crm/|decor/|mood/|team/|vcard/|favicon\\.ico$|icon\\.png$|apple-icon\\.png$|opengraph-image$|robots\\.txt$|sitemap\\.xml$).*)",
     "/api/auth/:path*",
   ],
 };
